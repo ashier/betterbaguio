@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /service-details/
+Disallow: /react-app/
+
+Sitemap: https://betterbaguio.org/sitemap.xml

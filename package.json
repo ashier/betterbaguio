@@ -1,0 +1,51 @@
+{
+  "name": "better-baguio-web",
+  "version": "0.1.0",
+  "description": "BetterBaguio.org - independent civic information for Baguio City",
+  "scripts": {
+    "dev": "python3 -m http.server 8000",
+    "build": "bash build.sh",
+    "build:major": "bash scripts/version.sh major && bash build.sh --no-bump",
+    "build:minor": "bash scripts/version.sh minor && bash build.sh --no-bump",
+    "serve": "python3 -m http.server 8000",
+    "serve:dist": "cd dist && python3 -m http.server 8080",
+    "version:major": "node scripts/bump-version.js major",
+    "version:minor": "node scripts/bump-version.js minor",
+    "version:patch": "node scripts/bump-version.js patch",
+    "version:check": "node scripts/bump-version.js",
+    "test": "playwright test",
+    "test:chrome": "playwright test --project=chrome",
+    "test:report": "playwright show-report",
+    "lighthouse": "lhci autorun",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "package": "bash scripts/package-cpanel.sh --build",
+    "package:only": "bash scripts/package-cpanel.sh"
+  },
+  "keywords": [
+    "baguio-city",
+    "cordillera",
+    "government",
+    "lgu"
+  ],
+  "author": "Better Baguio volunteers",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/cli": "^7.23.9",
+    "@babel/core": "^7.29.6",
+    "@babel/preset-env": "^7.23.9",
+    "@lhci/cli": "^0.15.1",
+    "@playwright/test": "^1.61.0",
+    "clean-css-cli": "^5.6.3",
+    "core-js": "^3.40.0",
+    "html-minifier-terser": "^7.2.0",
+    "playwright": "^1.61.0",
+    "prettier": "^3.8.1",
+    "terser": "^5.44.1"
+  },
+  "overrides": {
+    "tmp": "0.2.7",
+    "js-yaml": "^4.2.0",
+    "uuid": "^11.1.1"
+  }
+}

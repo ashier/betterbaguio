@@ -1,0 +1,6 @@
+{
+  "_status": "live_source_only",
+  "_note": "Use the official Baguio City Council database to avoid stale or incomplete replicated records.",
+  "source": "https://citycouncil.baguio.gov.ph/resolutions",
+  "resolutions": []
+}

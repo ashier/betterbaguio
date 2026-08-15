@@ -1,0 +1,22 @@
+{
+  "_status": "verified_for_2025_2028_term",
+  "_last_verified": "2026-08-15",
+  "mayor": { "name": "Hon. Benjamin B. Magalong", "title": "City Mayor" },
+  "vice_mayor": { "name": "Hon. Faustino A. Olowan", "title": "City Vice Mayor and Presiding Officer" },
+  "representative": { "name": "Hon. Mauricio G. Domogan", "title": "Lone District Representative" },
+  "councilors": [
+    { "name": "Hon. Edison R. Bilog", "title": "City Councilor" },
+    { "name": "Hon. Joel A. Alangsab", "title": "City Councilor" },
+    { "name": "Hon. Jose M. Molintas", "title": "City Councilor" },
+    { "name": "Hon. Leandro B. Yangot Jr.", "title": "City Councilor" },
+    { "name": "Hon. Vladimir D. Cayabas", "title": "City Councilor" },
+    { "name": "Hon. Peter C. Fianza", "title": "City Councilor" },
+    { "name": "Hon. Van Oliver M. Dicang", "title": "City Councilor" },
+    { "name": "Hon. Fred L. Bagbagen", "title": "City Councilor" },
+    { "name": "Hon. Paolo Raynor E. Salvosa", "title": "City Councilor" },
+    { "name": "Hon. Betty Lourdes F. Tabanda", "title": "City Councilor" },
+    { "name": "Hon. Yuri K. Weygan", "title": "City Councilor" },
+    { "name": "Hon. Elmer O. Datuin", "title": "City Councilor" }
+  ],
+  "official_portals": ["https://main.baguio.gov.ph/government", "https://citycouncil.baguio.gov.ph/"]
+}

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 128" role="img" aria-labelledby="title desc">
+  <title id="title">Better Baguio</title>
+  <desc id="desc">A pine tree and mountain mark beside the Better Baguio wordmark</desc>
+  <g fill="none" fill-rule="evenodd">
+    <rect width="112" height="112" x="8" y="8" rx="28" fill="#123f33"/>
+    <path d="M26 88 51 50l13 18 16-27 24 47H26Z" fill="#d8b45b"/>
+    <path d="M64 25 48 52h11L43 76h15v20h12V76h15L69 52h11L64 25Z" fill="#f7fbf8"/>
+    <text x="142" y="63" fill="#123f33" font-family="Inter,system-ui,sans-serif" font-size="46" font-weight="800" letter-spacing="-1.8">Better</text>
+    <text x="142" y="104" fill="#35745f" font-family="Inter,system-ui,sans-serif" font-size="46" font-weight="700" letter-spacing="-1.5">Baguio</text>
+  </g>
+</svg>

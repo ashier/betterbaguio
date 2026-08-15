@@ -1,0 +1,296 @@
+# Better Baguio - Apache configuration for cPanel
+# Security Headers & Performance Optimizations
+# Updated: 2026-08-15
+
+# ============================================
+# HTTPS REDIRECT (Force Secure Connection)
+# ============================================
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Force HTTPS (uncomment for production)
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # Force www (optional - uncomment if needed)
+    # RewriteCond %{HTTP_HOST} !^www\. [NC]
+    # RewriteRule ^(.*)$ https://www.%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # Remove .html extension from URLs (redirect to clean URL)
+    RewriteCond %{THE_REQUEST} /([^.]+)\.html [NC]
+    RewriteRule ^ /%1 [NC,L,R=301]
+
+    # Serve .html files for clean URLs (internal rewrite)
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME}.html -f
+    RewriteRule ^(.+)$ $1.html [L]
+</IfModule>
+
+# ============================================
+# SECURITY HEADERS
+# ============================================
+<IfModule mod_headers.c>
+    # Prevent clickjacking attacks
+    Header always set X-Frame-Options "SAMEORIGIN"
+
+    # Prevent MIME type sniffing
+    Header always set X-Content-Type-Options "nosniff"
+
+    # Enable XSS filtering (legacy browsers)
+    Header always set X-XSS-Protection "1; mode=block"
+
+    # Control referrer information
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # Permissions Policy (restrict browser features)
+    Header always set Permissions-Policy "geolocation=(self), microphone=(), camera=(), payment=(), usb=()"
+
+    # Content Security Policy
+    # Allows: self, Google Fonts, Bootstrap Icons CDN, Leaflet, Google Analytics, Open-Meteo API
+    # img-src lists tile.openstreetmap.org explicitly because some cPanel hosts inject their own
+    # CSP alongside this one; browsers then enforce both (most restrictive wins). Explicit listing
+    # ensures OSM tiles survive even if the host's injected CSP omits the https: wildcard.
+    # Facebook Page Plugin (direct iframe, no SDK) requires connect.facebook.net in script-src
+    # (SDK bootstrap), staticxx.facebook.com in frame-src (XD-arbiter bridge), and
+    # www.facebook.com + graph.facebook.com in connect-src (plugin API calls). Without these,
+    # the plugin loads but renders blank because its internal communication is blocked.
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://unpkg.com https://cdn.jsdelivr.net https://connect.facebook.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://unpkg.com https://*.fbcdn.net; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: blob: https: https://unpkg.com https://cdn.jsdelivr.net https://*.tile.openstreetmap.org https://www.google-analytics.com https://*.fbcdn.net https://*.facebook.com; connect-src 'self' blob: https://api.open-meteo.com https://api.exchangerate.host https://open.er-api.com https://www.google-analytics.com https://*.tile.openstreetmap.org https://unpkg.com https://cdn.jsdelivr.net https://www.facebook.com https://graph.facebook.com https://connect.facebook.net; frame-src 'self' https://www.openstreetmap.org https://www.google.com https://www.facebook.com https://web.facebook.com https://staticxx.facebook.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self';"
+
+    # Strict Transport Security (HSTS) - Enable after confirming HTTPS works
+    # Tells browsers to only use HTTPS for 1 year
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+
+    # Remove server signature
+    Header unset Server
+    Header always unset X-Powered-By
+</IfModule>
+
+# ============================================
+# CUSTOM ERROR PAGES
+# ============================================
+ErrorDocument 400 /404.html
+ErrorDocument 401 /403.html
+ErrorDocument 403 /403.html
+ErrorDocument 404 /404.html
+ErrorDocument 500 /500.html
+ErrorDocument 502 /500.html
+ErrorDocument 503 /500.html
+
+# ============================================
+# CHARACTER ENCODING
+# ============================================
+AddDefaultCharset UTF-8
+<IfModule mod_mime.c>
+    AddCharset UTF-8 .html .css .js .json .xml .txt
+</IfModule>
+
+# ============================================
+# MIME TYPES
+# ============================================
+<IfModule mod_mime.c>
+    # Web fonts
+    AddType font/woff2 .woff2
+    AddType font/woff .woff
+    AddType application/font-woff .woff
+    AddType application/font-woff2 .woff2
+
+    # SVG
+    AddType image/svg+xml .svg .svgz
+
+    # JSON
+    AddType application/json .json
+
+    # JavaScript
+    AddType application/javascript .js
+
+    # Manifest
+    AddType application/manifest+json .webmanifest
+</IfModule>
+
+# ============================================
+# BROWSER CACHING
+# ============================================
+<IfModule mod_expires.c>
+    ExpiresActive On
+
+    # Default expiration
+    ExpiresDefault "access plus 1 month"
+
+    # HTML - short cache for dynamic content
+    ExpiresByType text/html "access plus 1 hour"
+
+    # CSS and JavaScript
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+
+    # Images
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/x-icon "access plus 1 year"
+
+    # Fonts
+    ExpiresByType font/woff "access plus 1 year"
+    ExpiresByType font/woff2 "access plus 1 year"
+    ExpiresByType application/font-woff "access plus 1 year"
+    ExpiresByType application/font-woff2 "access plus 1 year"
+
+    # Data
+    ExpiresByType application/json "access plus 1 day"
+    ExpiresByType application/xml "access plus 1 day"
+    ExpiresByType text/xml "access plus 1 day"
+</IfModule>
+
+# ============================================
+# CACHE CONTROL HEADERS
+# ============================================
+<IfModule mod_headers.c>
+    # Cache static assets
+    <FilesMatch "\.(ico|jpg|jpeg|png|gif|svg|webp|woff|woff2|css|js)$">
+        Header set Cache-Control "public, max-age=2592000"
+    </FilesMatch>
+
+    # Don't cache HTML (or cache briefly)
+    <FilesMatch "\.(html|htm)$">
+        Header set Cache-Control "public, max-age=3600, must-revalidate"
+    </FilesMatch>
+
+    # Don't cache JSON data files
+    <FilesMatch "\.(json)$">
+        Header set Cache-Control "public, max-age=86400, must-revalidate"
+    </FilesMatch>
+
+    # Service Worker - never cache
+    <FilesMatch "sw\.js$">
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+        Header set Service-Worker-Allowed "/"
+    </FilesMatch>
+</IfModule>
+
+# ============================================
+# IMMUTABLE ASSETS (Next.js build output)
+# ============================================
+# Everything under /_next/static/ carries a content hash in its filename, so a
+# changed file is always a new URL and the old one can never go stale. Marking
+# it immutable stops browsers revalidating it at all.
+# Path-scoped rules are not possible with <FilesMatch>, and <Directory> is not
+# allowed in .htaccess, so the path is tagged via a rewrite env var and the
+# header keyed off that tag. This block sits after the generic rules above so
+# its Cache-Control wins for these files.
+<IfModule mod_rewrite.c>
+    RewriteRule ^_next/static/ - [E=IMMUTABLE_ASSET:1]
+</IfModule>
+<IfModule mod_headers.c>
+    Header set Cache-Control "public, max-age=31536000, immutable" env=IMMUTABLE_ASSET
+</IfModule>
+
+# ============================================
+# BROTLI COMPRESSION (preferred when available)
+# ============================================
+# LiteSpeed and most current cPanel Apache builds ship mod_brotli. Where it is
+# present browsers negotiate br over gzip and text payloads land roughly 15-20%
+# smaller; where it is absent this block is skipped and the gzip rules below
+# still apply, so no host is left worse off.
+<IfModule mod_brotli.c>
+    AddOutputFilterByType BROTLI_COMPRESS text/html
+    AddOutputFilterByType BROTLI_COMPRESS text/css
+    AddOutputFilterByType BROTLI_COMPRESS text/javascript
+    AddOutputFilterByType BROTLI_COMPRESS application/javascript
+    AddOutputFilterByType BROTLI_COMPRESS application/json
+    AddOutputFilterByType BROTLI_COMPRESS application/manifest+json
+    AddOutputFilterByType BROTLI_COMPRESS application/xml
+    AddOutputFilterByType BROTLI_COMPRESS text/xml
+    AddOutputFilterByType BROTLI_COMPRESS text/plain
+    AddOutputFilterByType BROTLI_COMPRESS image/svg+xml
+</IfModule>
+
+# ============================================
+# GZIP COMPRESSION
+# ============================================
+<IfModule mod_deflate.c>
+    # Compress HTML, CSS, JavaScript, Text, XML and fonts
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE text/javascript
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/json
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE image/svg+xml
+    AddOutputFilterByType DEFLATE font/woff
+    AddOutputFilterByType DEFLATE font/woff2
+    AddOutputFilterByType DEFLATE application/font-woff
+    AddOutputFilterByType DEFLATE application/font-woff2
+
+    # Remove browser bugs
+    BrowserMatch ^Mozilla/4 gzip-only-text/html
+    BrowserMatch ^Mozilla/4\.0[678] no-gzip
+    BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+    Header append Vary User-Agent
+</IfModule>
+
+# ============================================
+# FILE ACCESS PROTECTION
+# ============================================
+# Access rules are written twice on purpose. cPanel hosts run either Apache 2.4
+# or LiteSpeed; 2.4 uses `Require`, while the older `Order/Deny` syntax works
+# only when mod_access_compat happens to be loaded. Emitting both, each guarded
+# by its own mod_authz_core version check, keeps the rules effective on any
+# cPanel box rather than silently doing nothing on a host without compat.
+
+# Protect dotfiles (.htaccess, .env, .git remnants, editor configs)
+<FilesMatch "^\.">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Protect backup, config and script files
+<FilesMatch "\.(bak|config|sql|fla|psd|ini|log|sh|inc|swp|dist|old|backup|yml|yaml|lock)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Re-allow the site's own JSON data files, which the front end fetches
+<FilesMatch "^(officials|ordinances|resolutions|services|competitive-index|dpwh-projects|news|demographics|fiscal_transparency)\.json$">
+    <IfModule mod_authz_core.c>
+        Require all granted
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Allow from all
+    </IfModule>
+</FilesMatch>
+
+# ============================================
+# DIRECTORY PROTECTION
+# ============================================
+# Disable directory browsing
+Options -Indexes
+
+# Disable server signature
+ServerSignature Off
+
+# ============================================
+# HOTLINK PROTECTION (Optional)
+# ============================================
+# Uncomment to prevent image hotlinking
+# <IfModule mod_rewrite.c>
+#     RewriteCond %{HTTP_REFERER} !^$
+#     RewriteCond %{HTTP_REFERER} !^https?://(www\.)?betterbaguio\.org [NC]
+#     RewriteRule \.(jpg|jpeg|png|gif|svg|webp)$ - [F,NC,L]
+# </IfModule>

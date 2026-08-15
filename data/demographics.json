@@ -1,0 +1,23 @@
+{
+  "_schema_version": "1.0",
+  "_status": "verified",
+  "_last_verified": "2026-08-15",
+  "_sources": [
+    "https://psa.gov.ph/classification/psgc/barangays/1430300000",
+    "https://rssocar.psa.gov.ph/content/city-baguio-population-reaches-366358-persons-2024",
+    "https://psa.gov.ph/system/files/psy/2025%20PSY%20Final_signed.pdf"
+  ],
+  "city": "Baguio",
+  "region": "Cordillera Administrative Region",
+  "classification": "Highly urbanized city",
+  "income_class": "1st",
+  "population": { "total": 368426, "year": 2024, "reference_date": "2024-07-01", "source": "Philippine Statistics Authority, 2024 POPCEN" },
+  "land_area_km2": 57.51,
+  "barangay_count": 129,
+  "population_growth_rate_2020_2024": 0.14,
+  "largest_barangays": [
+    { "name": "Irisan", "population": 36932 },
+    { "name": "Bakakeng Central", "population": 12931 },
+    { "name": "Asin Road", "population": 12926 }
+  ]
+}

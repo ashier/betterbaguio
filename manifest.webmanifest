@@ -1,0 +1,10 @@
+{
+  "name": "Better Baguio",
+  "short_name": "BetterBaguio",
+  "description": "Independent civic information for Baguio City.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f2f7f4",
+  "theme_color": "#123f33",
+  "icons": [{ "src": "/assets/images/logo/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}
