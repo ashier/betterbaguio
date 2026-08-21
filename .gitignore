@@ -53,6 +53,8 @@ assets/images/logo/*
 !assets/images/logo/better-baguio-logo.svg
 !assets/images/logo/better-baguio-logo-white.svg
 !assets/images/logo/favicon.svg
+!assets/images/logo/better-baguio-mark.png
+!assets/images/logo/better-baguio-wordmark.png
 scripts/*
 !scripts/bump-version.js
 !scripts/copy-dist.js

@@ -1,9 +1,9 @@
-var CACHE = 'betterbaguio-v0.1.0';
+var CACHE = 'betterbaguio-v0.1.0-logo';
 var CORE = [
   '/', '/services/', '/government/', '/statistics/', '/legislative/', '/budget/', '/contact/',
   '/assets/css/better-baguio.css', '/assets/js/site-shell.js',
-  '/assets/images/logo/better-baguio-logo.svg', '/assets/images/logo/better-baguio-logo-white.svg',
-  '/assets/images/logo/favicon.svg', '/manifest.webmanifest'
+  '/assets/images/logo/better-baguio-mark.png',
+  '/manifest.webmanifest'
 ];
 
 self.addEventListener('install', function (event) {

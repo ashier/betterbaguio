@@ -65,10 +65,10 @@ if command -v rsync &>/dev/null; then
         --exclude='assets/css/*' \
         --include='assets/js/site-shell.js' \
         --exclude='assets/js/*' \
-        --include='assets/images/logo/better-baguio-logo.svg' \
-        --include='assets/images/logo/better-baguio-logo-white.svg' \
-        --include='assets/images/logo/favicon.svg' \
+        --include='assets/images/logo/better-baguio-mark.png' \
         --exclude='assets/images/logo/*' \
+        --exclude='assets/betterbaguio-logo.png' \
+        --exclude='assets/betterbaguio-logo-text.png' \
         --exclude='assets/images/banners' \
         --exclude='assets/animation' \
         --exclude='data' \

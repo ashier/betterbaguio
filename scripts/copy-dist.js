@@ -33,6 +33,8 @@ const EXCLUDED = new Set([
   '.prettierignore',
   '.editorconfig',
   'release',
+  'betterbaguio-logo.png',
+  'betterbaguio-logo-text.png',
 ]);
 
 const EXCLUDED_EXT = new Set(['.backup', '.md', '.zip', '.log']);

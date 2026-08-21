@@ -1,6 +1,7 @@
 {
   "_status": "verified_for_2025_2028_term",
-  "_last_verified": "2026-08-15",
+  "_last_verified": "2026-08-21",
+  "term": { "starts": "2025-07-01", "ends": "2028-06-30", "council_number": 20 },
   "mayor": { "name": "Hon. Benjamin B. Magalong", "title": "City Mayor" },
   "vice_mayor": { "name": "Hon. Faustino A. Olowan", "title": "City Vice Mayor and Presiding Officer" },
   "representative": { "name": "Hon. Mauricio G. Domogan", "title": "Lone District Representative" },
@@ -8,7 +9,7 @@
     { "name": "Hon. Edison R. Bilog", "title": "City Councilor" },
     { "name": "Hon. Joel A. Alangsab", "title": "City Councilor" },
     { "name": "Hon. Jose M. Molintas", "title": "City Councilor" },
-    { "name": "Hon. Leandro B. Yangot Jr.", "title": "City Councilor" },
+    { "name": "Hon. Leandro B. Yangot", "title": "City Councilor" },
     { "name": "Hon. Vladimir D. Cayabas", "title": "City Councilor" },
     { "name": "Hon. Peter C. Fianza", "title": "City Councilor" },
     { "name": "Hon. Van Oliver M. Dicang", "title": "City Councilor" },
@@ -18,5 +19,15 @@
     { "name": "Hon. Yuri K. Weygan", "title": "City Councilor" },
     { "name": "Hon. Elmer O. Datuin", "title": "City Councilor" }
   ],
-  "official_portals": ["https://main.baguio.gov.ph/government", "https://citycouncil.baguio.gov.ph/"]
+  "ex_officio_members": [
+    { "name": "Hon. Rocky M. Aliping", "title": "Liga ng mga Barangay President" },
+    { "name": "Hon. John Rhey L. Mananeng", "title": "Sangguniang Kabataan Federation President" },
+    { "name": "Hon. Maximo H. Edwin Jr.", "title": "Indigenous Peoples Mandatory Representative" }
+  ],
+  "official_portals": [
+    "https://main.baguio.gov.ph/government",
+    "https://main.baguio.gov.ph/api/v1/public/current-officials",
+    "https://citycouncil.baguio.gov.ph/members",
+    "https://congress.gov.ph/house-members/view/D024"
+  ]
 }

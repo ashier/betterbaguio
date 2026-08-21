@@ -1,11 +1,13 @@
 {
   "_schema_version": "1.0",
   "_status": "verified",
-  "_last_verified": "2026-08-15",
+  "_last_verified": "2026-08-21",
   "_sources": [
     "https://psa.gov.ph/classification/psgc/barangays/1430300000",
     "https://rssocar.psa.gov.ph/content/city-baguio-population-reaches-366358-persons-2024",
-    "https://psa.gov.ph/system/files/psy/2025%20PSY%20Final_signed.pdf"
+    "https://psa.gov.ph/system/files/psy/2025%20PSY%20Final_signed.pdf",
+    "https://rssocar.psa.gov.ph/content/provincial-product-accounts-2024-economic-performance-city-baguio",
+    "https://rssocar.psa.gov.ph/system/files/statwatch/Baguio_City_SW_Q1_2026.pdf"
   ],
   "city": "Baguio",
   "region": "Cordillera Administrative Region",
@@ -18,6 +20,28 @@
   "largest_barangays": [
     { "name": "Irisan", "population": 36932 },
     { "name": "Bakakeng Central", "population": 12931 },
-    { "name": "Asin Road", "population": 12926 }
-  ]
+    { "name": "Asin Road", "population": 12926 },
+    { "name": "Camp 7", "population": 12597 },
+    { "name": "Loakan Proper", "population": 12154 },
+    { "name": "Bakakeng North", "population": 11756 },
+    { "name": "San Luis Village", "population": 8935 },
+    { "name": "Pinsao Proper", "population": 8822 },
+    { "name": "Gibraltar", "population": 7781 },
+    { "name": "Fairview Village", "population": 7714 }
+  ],
+  "economy_2024": {
+    "basis": "constant 2018 prices",
+    "gdp_php_billion": 178.85,
+    "real_growth_percent": 5.8,
+    "per_capita_gdp_php": 485433,
+    "shares_percent": { "services": 74.9, "industry": 24.6, "agriculture_forestry_fishing": 0.5 }
+  },
+  "latest_indicators": {
+    "inflation": { "value_percent": 6.2, "reference_period": "2026-03" },
+    "visitor_arrivals": { "total": 222980, "domestic": 218573, "foreign": 4401, "balikbayan": 6, "reference_period": "2026-Q1" },
+    "public_elementary_enrolment": { "total": 34456, "reference_period": "SY 2024-2025" },
+    "literacy_ages_10_64": { "simple_percent": 94.3, "functional_percent": 89.8, "reference_period": "2024" },
+    "solid_waste_generation_kg_per_capita_day": { "value": 0.519, "reference_period": "2026-Q1" },
+    "permits": { "building": 105, "occupancy": 46, "reference_period": "2026-Q1" }
+  }
 }

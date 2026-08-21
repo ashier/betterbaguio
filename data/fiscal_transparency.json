@@ -1,9 +1,19 @@
 {
   "_schema_version": "1.0",
-  "_status": "draft",
-  "_source": "Bureau of Local Government Finance (BLGF) / LGU Baguio Budget Office",
-  "_note": "Awaiting official fiscal data",
+  "_status": "verified_quarterly_revenue_only",
+  "_last_verified": "2026-08-21",
+  "_source": "https://rssocar.psa.gov.ph/system/files/statwatch/Baguio_City_SW_Q1_2026.pdf",
+  "_reporting_agency": "Office of the City Treasurer, consolidated by PSA-CAR StatWatch",
+  "_note": "Quarterly revenue receipts are not the annual appropriated budget. Values are in millions of Philippine pesos and may not add due to rounding.",
   "city": "Baguio",
-  "province": "Cordillera Administrative Region",
-  "fiscal_years": []
+  "region": "Cordillera Administrative Region",
+  "public_finance": {
+    "reference_period": "2026-Q1",
+    "unit": "PHP million",
+    "total_revenues": 1235.1,
+    "tax_revenues": 570.2,
+    "non_tax_revenues": 200.4,
+    "share_from_national_tax_collection": 464.5,
+    "comparison_total_revenues": { "reference_period": "2025-Q1", "value": 1116.3 }
+  }
 }
