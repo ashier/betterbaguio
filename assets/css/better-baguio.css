@@ -57,35 +57,35 @@ a { color: var(--bb-green); }
 .bb-hero { overflow: hidden; position: relative; padding: 92px 0 82px; background: radial-gradient(circle at 80% 15%, rgba(216,180,91,.23), transparent 24%), linear-gradient(145deg, #edf6f1 0%, #fff 58%); transition: background 1s ease; }
 .bb-hero::after { content: ""; position: absolute; z-index: 0; right: -130px; bottom: -190px; width: 520px; height: 520px; border: 72px solid rgba(53,116,95,.08); border-radius: 50%; }
 .bb-hero[data-weather-state="clear"] { background: radial-gradient(circle at 84% 14%, rgba(255,210,95,.36), transparent 25%), linear-gradient(145deg, #dff2fa 0%, #f7fbf7 62%, #fff 100%); }
-.bb-hero[data-weather-state="cloudy"] { background: linear-gradient(145deg, #e0e8e8 0%, #f1f5f2 50%, #fff 100%); }
+.bb-hero[data-weather-state="cloudy"] { background: linear-gradient(145deg, #cbd9da 0%, #e3eae7 50%, #f7f9f7 100%); }
 .bb-hero[data-weather-state="rain"] { background: linear-gradient(145deg, #cad9da 0%, #e8efec 56%, #f8faf8 100%); }
-.bb-hero[data-weather-state="fog"] { background: linear-gradient(145deg, #e8efec 0%, #f5f7f4 52%, #fff 100%); }
+.bb-hero[data-weather-state="fog"] { background: linear-gradient(145deg, #d4dfdc 0%, #e9efec 52%, #fafbfa 100%); }
 .bb-hero[data-weather-state="clear"].is-weather-night { background: linear-gradient(145deg, #dce8eb 0%, #edf3f1 54%, #fff 100%); }
-.bb-weather-scene { position: absolute; z-index: 0; inset: 0; overflow: hidden; pointer-events: none; }
+.bb-weather-scene { position: absolute; z-index: 1; inset: 0; overflow: hidden; pointer-events: none; }
 .bb-weather-sun { position: absolute; top: 62px; right: 9%; width: 128px; height: 128px; border-radius: 50%; opacity: 0; background: radial-gradient(circle, rgba(255,225,130,.8) 0 28%, rgba(255,210,90,.34) 29% 55%, rgba(255,210,90,0) 72%); transform: scale(.8); transition: opacity 1s ease, transform 1s ease; }
 .bb-hero[data-weather-state="clear"] .bb-weather-sun { opacity: .95; transform: scale(1); animation: bb-sun-breathe 8s ease-in-out infinite; }
 .bb-hero.is-weather-night .bb-weather-sun { width: 90px; height: 90px; opacity: .55; background: radial-gradient(circle at 38% 38%, #fff 0 32%, #dae5e4 33% 54%, rgba(218,229,228,0) 70%); }
-.bb-weather-cloud { position: absolute; width: 220px; height: 64px; border-radius: 999px; opacity: 0; background: rgba(255,255,255,.76); box-shadow: 0 20px 45px rgba(48,74,69,.08); transition: opacity 1s ease; }
+.bb-weather-cloud { position: absolute; width: 220px; height: 64px; border: 1px solid rgba(75,105,101,.12); border-radius: 999px; opacity: 0; background: rgba(220,230,228,.94); box-shadow: 0 22px 48px rgba(35,64,60,.18); transition: opacity 1s ease; }
 .bb-weather-cloud::before, .bb-weather-cloud::after { content: ""; position: absolute; bottom: 12px; border-radius: 50%; background: inherit; }
 .bb-weather-cloud::before { left: 38px; width: 82px; height: 82px; }
 .bb-weather-cloud::after { right: 34px; width: 105px; height: 105px; }
-.bb-weather-cloud-one { top: 74px; right: -40px; transform: scale(1.2); }
-.bb-weather-cloud-two { top: 220px; right: 24%; transform: scale(.72); }
-.bb-weather-cloud-three { top: 330px; right: -5px; transform: scale(.52); }
-.bb-hero[data-weather-state="cloudy"] .bb-weather-cloud, .bb-hero[data-weather-state="rain"] .bb-weather-cloud { opacity: .78; animation: bb-cloud-drift 16s ease-in-out infinite alternate; }
-.bb-hero[data-weather-state="cloudy"] .bb-weather-cloud-two, .bb-hero[data-weather-state="rain"] .bb-weather-cloud-two { animation-delay: -6s; opacity: .56; }
-.bb-hero[data-weather-state="cloudy"] .bb-weather-cloud-three, .bb-hero[data-weather-state="rain"] .bb-weather-cloud-three { animation-delay: -10s; opacity: .44; }
+.bb-weather-cloud-one { top: 400px; right: 2%; transform: scale(1.2); }
+.bb-weather-cloud-two { top: 540px; right: 38%; transform: scale(.82); }
+.bb-weather-cloud-three { top: 680px; right: 9%; transform: scale(.68); }
+.bb-hero[data-weather-state="cloudy"] .bb-weather-cloud, .bb-hero[data-weather-state="rain"] .bb-weather-cloud { opacity: .9; animation: bb-cloud-drift 16s ease-in-out infinite alternate; }
+.bb-hero[data-weather-state="cloudy"] .bb-weather-cloud-two, .bb-hero[data-weather-state="rain"] .bb-weather-cloud-two { animation-delay: -6s; opacity: .78; }
+.bb-hero[data-weather-state="cloudy"] .bb-weather-cloud-three, .bb-hero[data-weather-state="rain"] .bb-weather-cloud-three { animation-delay: -10s; opacity: .68; }
 .bb-hero[data-weather-state="rain"] .bb-weather-cloud { background: rgba(225,235,234,.88); box-shadow: 0 22px 48px rgba(35,64,60,.14); }
 .bb-weather-rain { position: absolute; inset: 0; opacity: 0; background-image: repeating-linear-gradient(108deg, transparent 0 25px, rgba(75,121,130,.22) 26px 28px, transparent 29px 52px); background-size: 90px 160px; mask-image: linear-gradient(to right, transparent 0%, #000 45%, #000 100%); transition: opacity .8s ease; }
 .bb-hero[data-weather-state="rain"] .bb-weather-rain { opacity: .64; animation: bb-rain-fall 1.05s linear infinite; }
-.bb-weather-fog { position: absolute; right: -8%; width: 70%; height: 62px; border-radius: 999px; opacity: 0; background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.74) 16% 84%, rgba(255,255,255,0)); transition: opacity 1s ease; }
-.bb-weather-fog-one { top: 105px; }
-.bb-weather-fog-two { top: 225px; right: 10%; width: 62%; }
-.bb-weather-fog-three { top: 360px; right: -2%; width: 78%; }
-.bb-hero[data-weather-state="fog"] .bb-weather-fog { opacity: .76; animation: bb-fog-drift 12s ease-in-out infinite alternate; }
-.bb-hero[data-weather-state="fog"] .bb-weather-fog-two { animation-delay: -4s; opacity: .6; }
-.bb-hero[data-weather-state="fog"] .bb-weather-fog-three { animation-delay: -8s; opacity: .5; }
-.bb-hero-grid { position: relative; z-index: 1; display: grid; grid-template-columns: 1.35fr .65fr; gap: 68px; align-items: center; }
+.bb-weather-fog { position: absolute; right: -8%; width: 78%; height: 78px; border-radius: 999px; opacity: 0; background: linear-gradient(90deg, rgba(176,197,194,0), rgba(176,197,194,.68) 16%, rgba(246,248,246,.9) 48%, rgba(176,197,194,.62) 84%, rgba(176,197,194,0)); box-shadow: 0 15px 32px rgba(51,78,73,.12); transition: opacity 1s ease; }
+.bb-weather-fog-one { top: 125px; }
+.bb-weather-fog-two { top: 285px; right: 10%; width: 70%; }
+.bb-weather-fog-three { top: 450px; right: -2%; width: 84%; }
+.bb-hero[data-weather-state="fog"] .bb-weather-fog { opacity: .9; animation: bb-fog-drift 12s ease-in-out infinite alternate; }
+.bb-hero[data-weather-state="fog"] .bb-weather-fog-two { animation-delay: -4s; opacity: .75; }
+.bb-hero[data-weather-state="fog"] .bb-weather-fog-three { animation-delay: -8s; opacity: .66; }
+.bb-hero-grid { position: relative; z-index: 2; display: grid; grid-template-columns: 1.35fr .65fr; gap: 68px; align-items: center; }
 .bb-eyebrow { color: var(--bb-green); text-transform: uppercase; letter-spacing: .14em; font-weight: 800; font-size: .78rem; }
 .bb-hero h1, .bb-page-hero h1 { margin: 12px 0 18px; max-width: 850px; color: var(--bb-pine); font-size: clamp(2.7rem, 7vw, 5.6rem); line-height: .98; letter-spacing: -.055em; }
 .bb-hero p { max-width: 700px; margin: 0 0 28px; color: var(--bb-muted); font-size: clamp(1.05rem, 2vw, 1.28rem); }
@@ -194,10 +194,10 @@ a.bb-card:hover { transform: translateY(-3px); box-shadow: var(--bb-shadow); }
   .bb-header.is-compact .bb-logo-text { font-size: 1.1rem; }
   .bb-hero { padding: 64px 0; }
   .bb-weather-sun { top: 88px; right: -28px; width: 112px; height: 112px; }
-  .bb-weather-cloud-one { top: 122px; right: -118px; }
-  .bb-weather-cloud-two { top: 310px; right: -86px; }
+  .bb-weather-cloud-one { top: 430px; right: -42px; }
+  .bb-weather-cloud-two { top: 640px; right: -20px; }
   .bb-weather-cloud-three { display: none; }
-  .bb-weather-fog { right: -35%; width: 110%; }
+  .bb-weather-fog { right: -18%; width: 120%; }
   .bb-weather-summary { display: grid; grid-template-columns: auto 1fr; width: 100%; }
   .bb-weather-details { grid-column: 1 / -1; padding: 9px 0 0; border-top: 1px solid rgba(18,63,51,.14); border-left: 0; }
   .bb-weather-controls > span { flex-basis: 100%; }
