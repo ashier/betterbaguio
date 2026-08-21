@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Search Baguio City infrastructure projects by year, status, office, and barangay using official PRISM open data."><link rel="canonical" href="https://betterbaguio.org/projects/"><link rel="icon" href="/assets/images/logo/better-baguio-mark.png" type="image/png"><link rel="stylesheet" href="/assets/css/better-baguio.css"><title>City Projects Tracker | BetterBaguio.org</title></head>
+<body class="bb-body"><div data-site-header></div><main id="main-content">
+  <section class="bb-page-hero bb-projects-hero"><div class="bb-container"><span class="bb-eyebrow">Public infrastructure</span><h1>Follow Baguio’s city projects.</h1><p>Search official PRISM records by year, delivery stage, implementing office, or barangay. Appropriations are authorized project amounts—not proof of payment, completion, or final cost.</p></div></section>
+
+  <section class="bb-section"><div class="bb-container">
+    <div class="bb-data-strip"><div><strong>Weekly official-data snapshot</strong><span data-project-retrieved>Loading the latest verified copy…</span></div><a href="https://data.baguio.gov.ph/prism" target="_blank" rel="noopener">Open official PRISM dashboard →</a></div>
+
+    <div class="bb-metrics bb-project-metrics" aria-live="polite">
+      <article class="bb-metric"><strong data-project-count>—</strong><span>Matching projects</span><small data-project-year-label>Loading data</small></article>
+      <article class="bb-metric"><strong data-project-appropriation>—</strong><span>Total appropriation</span><small>For matching records</small></article>
+      <article class="bb-metric"><strong data-project-completed>—</strong><span>Marked completed</span><small>Official PRISM stage</small></article>
+      <article class="bb-metric"><strong data-project-contractors>—</strong><span>Named contractors</span><small>Records with a bidder listed</small></article>
+    </div>
+
+    <form class="bb-project-filters" data-project-filters>
+      <label class="bb-project-search"><span>Search projects</span><input type="search" data-project-search placeholder="Title, project ID, contractor…" autocomplete="off"></label>
+      <label><span>Year</span><select data-project-year aria-label="Project year"><option>Loading…</option></select></label>
+      <label><span>Status</span><select data-project-status><option value="">All statuses</option></select></label>
+      <label><span>Office</span><select data-project-office><option value="">All offices</option></select></label>
+      <label><span>Barangay / location</span><select data-project-barangay><option value="">All locations</option></select></label>
+      <button class="bb-button bb-button-secondary bb-project-clear" type="button" data-project-clear>Clear filters</button>
+    </form>
+
+    <div class="bb-project-layout">
+      <aside class="bb-project-breakdown" aria-labelledby="status-breakdown-title"><span class="bb-eyebrow">Delivery stages</span><h2 id="status-breakdown-title">Status breakdown</h2><p>Counts update with your filters.</p><div data-project-status-bars></div></aside>
+      <div class="bb-project-results">
+        <div class="bb-project-results-head"><div><span class="bb-eyebrow">Official project records</span><h2>Projects</h2></div><p data-project-results-summary role="status" aria-live="polite">Loading project records…</p></div>
+        <div class="bb-table-wrap"><table class="bb-table bb-project-table"><thead><tr><th>Status</th><th>Project</th><th>Location</th><th>Office / contractor</th><th>Appropriation</th></tr></thead><tbody data-project-rows><tr><td colspan="5">Loading the weekly PRISM snapshot…</td></tr></tbody></table></div>
+        <div class="bb-project-more"><button class="bb-button bb-button-secondary" type="button" data-project-more hidden>Show more projects</button></div>
+      </div>
+    </div>
+
+    <div class="bb-callout bb-project-note"><strong>How to read this:</strong> “Completed” is the stage reported by the City Government’s PRISM system. An appropriation is a budget authorization, not necessarily the amount spent. Blank contractor or location fields mean the source record did not provide a value.</div>
+    <ul class="bb-source-list"><li><a href="https://data.baguio.gov.ph/prism" target="_blank" rel="noopener">City Government of Baguio Open Data Portal — PRISM</a></li><li><a href="https://data.baguio.gov.ph/about" target="_blank" rel="noopener">Baguio Open Data Portal — purpose and limitations</a></li><li><a href="https://github.com/ashier/betterbaguio/blob/main/scripts/sync-prism.mjs" target="_blank" rel="noopener">BetterBaguio weekly snapshot and validation script</a></li></ul>
+    <noscript><div class="bb-callout" style="margin-top:20px"><strong>JavaScript is required for the searchable table.</strong> You can still review the records on the official PRISM dashboard linked above.</div></noscript>
+  </div></section>
+</main><div data-site-footer></div><script src="/assets/js/site-shell.js"></script><script src="/assets/js/projects-tracker.js"></script></body></html>

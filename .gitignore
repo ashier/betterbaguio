@@ -50,6 +50,7 @@ assets/css/*
 assets/js/*
 !assets/js/site-shell.js
 !assets/js/weather-hero.js
+!assets/js/projects-tracker.js
 assets/images/logo/*
 !assets/images/logo/better-baguio-logo.svg
 !assets/images/logo/better-baguio-logo-white.svg
@@ -61,4 +62,5 @@ scripts/*
 !scripts/copy-dist.js
 !scripts/package-cpanel.sh
 !scripts/version.sh
+!scripts/sync-prism.mjs
 data/competitive-index.json

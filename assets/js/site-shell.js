@@ -4,6 +4,7 @@
     ['Services', '/services/'],
     ['Government', '/government/'],
     ['Statistics', '/statistics/'],
+    ['Projects', '/projects/'],
     ['Legislative', '/legislative/'],
     ['Transparency', '/budget/'],
     ['Contact', '/contact/']

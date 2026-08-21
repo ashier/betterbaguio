@@ -37,5 +37,6 @@ jobs:
             http://localhost:8080/services/
             http://localhost:8080/contact/
             http://localhost:8080/government/
+            http://localhost:8080/projects/
           configPath: .lighthouserc.json
           uploadArtifacts: true

@@ -15,6 +15,7 @@ const EXCLUDED = new Set([
   '.DS_Store',
   'react-app',
   'admin',
+  'data',
   'build.sh',
   'babel.config.json',
   'serve.py',
@@ -73,4 +74,10 @@ if (!src || !dest) {
 }
 
 copyDir(path.resolve(src), path.resolve(dest));
+const prismSnapshot = path.join(path.resolve(src), 'data', 'prism', 'projects.json');
+if (fs.existsSync(prismSnapshot)) {
+  const prismDestination = path.join(path.resolve(dest), 'data', 'prism', 'projects.json');
+  fs.mkdirSync(path.dirname(prismDestination), { recursive: true });
+  fs.copyFileSync(prismSnapshot, prismDestination);
+}
 console.log(`Copied: ${src} → ${dest}`);

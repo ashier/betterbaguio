@@ -65,6 +65,7 @@ if command -v rsync &>/dev/null; then
         --exclude='assets/css/*' \
         --include='assets/js/site-shell.js' \
         --include='assets/js/weather-hero.js' \
+        --include='assets/js/projects-tracker.js' \
         --exclude='assets/js/*' \
         --include='assets/images/logo/better-baguio-mark.png' \
         --exclude='assets/images/logo/*' \
@@ -72,7 +73,10 @@ if command -v rsync &>/dev/null; then
         --exclude='assets/betterbaguio-logo-text.png' \
         --exclude='assets/images/banners' \
         --exclude='assets/animation' \
-        --exclude='data' \
+        --include='data/' \
+        --include='data/prism/' \
+        --include='data/prism/projects.json' \
+        --exclude='data/***' \
         --exclude='node_modules' \
         --exclude='dist' \
         --exclude='.git' \

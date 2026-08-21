@@ -1,7 +1,8 @@
-var CACHE = 'betterbaguio-v0.1.0-weather';
+var CACHE = 'betterbaguio-v0.1.0-projects';
 var CORE = [
-  '/', '/services/', '/government/', '/statistics/', '/legislative/', '/budget/', '/contact/',
-  '/assets/css/better-baguio.css', '/assets/js/site-shell.js', '/assets/js/weather-hero.js',
+  '/', '/services/', '/government/', '/statistics/', '/projects/', '/legislative/', '/budget/', '/contact/',
+  '/assets/css/better-baguio.css', '/assets/js/site-shell.js', '/assets/js/weather-hero.js', '/assets/js/projects-tracker.js',
+  '/data/prism/projects.json',
   '/assets/images/logo/better-baguio-mark.png',
   '/manifest.webmanifest'
 ];

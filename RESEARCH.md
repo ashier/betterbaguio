@@ -78,6 +78,14 @@ The home-page weather module requests current conditions and the day’s high/lo
 - No temperature is fabricated when both the API and cache are unavailable; the module links to PAGASA instead.
 - Weather artwork is informational and never replaces PAGASA rainfall, thunderstorm, typhoon, or hazard advisories.
 
+## Infrastructure projects and weekly open-data sync
+
+- The City Government’s [PRISM dashboard](https://data.baguio.gov.ph/prism) is the source for project IDs, titles, delivery stages, implementing offices, bidders, barangays, and appropriations.
+- Public PRISM endpoints used by the city dashboard are `https://data.baguio.gov.ph/api/prism/infra/stats` and `https://data.baguio.gov.ph/api/prism/infra/list`.
+- BetterBaguio stores a validated weekly snapshot for resilience and to avoid sending API requests for every page view. The scheduled sync runs Monday at 05:17 Asia/Manila and stays below the portal’s published 60-request rate limit.
+- The sync rejects malformed records, duplicate IDs within a year, incomplete pagination, and mismatches between aggregate and project-list totals.
+- PRISM states that its information is not real-time and is provided “as is.” An appropriation is an authorized project amount, not proof of expenditure, payment, completion, or final cost.
+
 ## Legal and historical baseline
 
 - [Act No. 48](https://elibrary.judiciary.gov.ph/thebookshelf/showdocs/28/15695) established local civil governments in Benguet townships, including Baguio, in November 1900.

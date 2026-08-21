@@ -9,6 +9,7 @@
     "build:minor": "bash scripts/version.sh minor && bash build.sh --no-bump",
     "serve": "python3 -m http.server 8000",
     "serve:dist": "cd dist && python3 -m http.server 8080",
+    "sync:prism": "node scripts/sync-prism.mjs",
     "version:major": "node scripts/bump-version.js major",
     "version:minor": "node scripts/bump-version.js minor",
     "version:patch": "node scripts/bump-version.js patch",
