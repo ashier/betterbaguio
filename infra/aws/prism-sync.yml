@@ -8,6 +8,19 @@ Parameters:
   AllowedWwwOrigin:
     Type: String
     Default: https://www.betterbaguio.org
+  DataDomainName:
+    Type: String
+    Default: ''
+    Description: Optional custom domain for the public PRISM snapshot
+  DataCertificateArn:
+    Type: String
+    Default: ''
+    Description: Optional us-east-1 ACM certificate covering DataDomainName
+
+Conditions:
+  UseDataCustomDomain: !And
+    - !Not [!Equals [!Ref DataDomainName, '']]
+    - !Not [!Equals [!Ref DataCertificateArn, '']]
 
 Resources:
   PrismDataBucket:
@@ -191,6 +204,10 @@ Resources:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
+        Aliases: !If
+          - UseDataCustomDomain
+          - - !Ref DataDomainName
+          - !Ref AWS::NoValue
         Comment: BetterBaguio weekly PRISM data
         DefaultCacheBehavior:
           AllowedMethods:
@@ -216,6 +233,12 @@ Resources:
             S3OriginConfig:
               OriginAccessIdentity: ''
         PriceClass: PriceClass_200
+        ViewerCertificate: !If
+          - UseDataCustomDomain
+          - AcmCertificateArn: !Ref DataCertificateArn
+            MinimumProtocolVersion: TLSv1.2_2021
+            SslSupportMethod: sni-only
+          - CloudFrontDefaultCertificate: true
       Tags:
         - Key: Project
           Value: BetterBaguio
@@ -470,9 +493,15 @@ Resources:
 Outputs:
   SnapshotUrl:
     Description: Public CloudFront URL for the validated PRISM snapshot
-    Value: !Sub https://${PrismDistribution.DomainName}/data/prism/projects.json
+    Value: !If
+      - UseDataCustomDomain
+      - !Sub https://${DataDomainName}/data/prism/projects.json
+      - !Sub https://${PrismDistribution.DomainName}/data/prism/projects.json
   DistributionId:
     Value: !Ref PrismDistribution
+  DistributionDomainName:
+    Description: CloudFront target for the custom data-domain DNS record
+    Value: !GetAtt PrismDistribution.DomainName
   SourceProxyUrl:
     Description: Restricted CloudFront relay used by Lambda to reach PRISM
     Value: !Sub https://${PrismSourceDistribution.DomainName}

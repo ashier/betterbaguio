@@ -151,7 +151,7 @@ Resources:
         SecurityHeadersConfig:
           ContentSecurityPolicy:
             ContentSecurityPolicy: >-
-              default-src 'self'; base-uri 'self'; connect-src 'self' https://api.open-meteo.com https://d2nylkwmqoqtlx.cloudfront.net; font-src 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'
+              default-src 'self'; base-uri 'self'; connect-src 'self' https://api.open-meteo.com https://data.betterbaguio.org; font-src 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'
             Override: true
           ContentTypeOptions:
             Override: true

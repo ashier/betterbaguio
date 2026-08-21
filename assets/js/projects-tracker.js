@@ -5,7 +5,7 @@
   if (!root) return;
 
   var SNAPSHOT_URLS = [
-    { url: 'https://d2nylkwmqoqtlx.cloudfront.net/data/prism/projects.json', label: 'AWS weekly snapshot' },
+    { url: 'https://data.betterbaguio.org/data/prism/projects.json', label: 'AWS weekly snapshot' },
     { url: '/data/prism/projects.json', label: 'bundled fallback' }
   ];
   var PAGE_SIZE = 25;
