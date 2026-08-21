@@ -58,7 +58,7 @@ a { color: var(--bb-green); }
 .bb-logo-text { display: inline-flex; align-items: baseline; transform: translateY(10px); font-size: 1.55rem; line-height: 1; letter-spacing: -.045em; transition: transform .22s ease, font-size .22s ease; }
 .bb-logo-text strong { color: #202725; font-weight: 800; }
 .bb-logo-text span { color: var(--bb-green); font-weight: 700; }
-.bb-menu { display: flex; align-items: center; gap: 6px; list-style: none; margin: 0; padding: 0; }
+.bb-menu { display: flex; align-items: center; gap: 6px; list-style: none; margin: 0; padding: 0; transform: translateY(15px); transition: transform .22s ease; }
 .bb-menu a { display: block; color: var(--bb-ink); text-decoration: none; padding: 10px 12px; border-radius: 10px; font-weight: 650; font-size: .94rem; }
 .bb-menu a:hover, .bb-menu a[aria-current="page"] { color: var(--bb-pine); background: var(--bb-mist); }
 .bb-menu-button { display: none; border: 1px solid var(--bb-line); background: #fff; padding: 9px 12px; border-radius: 10px; color: var(--bb-ink); font: inherit; font-weight: 700; }
@@ -66,6 +66,7 @@ a { color: var(--bb-green); }
 .bb-header.is-compact .bb-nav { min-height: 62px; }
 .bb-header.is-compact .bb-logo img { width: 44px; height: 44px; }
 .bb-header.is-compact .bb-logo-text { transform: translateY(6px); font-size: 1.25rem; }
+.bb-header.is-compact .bb-menu { transform: translateY(8px); }
 .bb-header.is-compact .bb-emergency { font-size: .7rem; }
 .bb-header.is-compact .bb-emergency .bb-container { min-height: 32px; gap: 3px 5px; padding-block: 3px; }
 .bb-header.is-compact .bb-emergency a { padding: 1px 5px; }
@@ -228,7 +229,7 @@ a.bb-card:hover { transform: translateY(-3px); box-shadow: var(--bb-shadow); }
 
 @media (max-width: 900px) {
   .bb-menu-button { display: block; }
-  .bb-menu { display: none; position: absolute; left: 20px; right: 20px; top: calc(100% + 8px); flex-direction: column; align-items: stretch; padding: 12px; border: 1px solid var(--bb-line); border-radius: 14px; background: #fff; box-shadow: var(--bb-shadow); }
+  .bb-menu { display: none; position: absolute; left: 20px; right: 20px; top: calc(100% + 8px); flex-direction: column; align-items: stretch; padding: 12px; border: 1px solid var(--bb-line); border-radius: 14px; background: #fff; box-shadow: var(--bb-shadow); transform: none; }
   .bb-menu.is-open { display: flex; }
   .bb-hero-grid { grid-template-columns: 1fr; gap: 34px; }
   .bb-grid, .bb-leaders { grid-template-columns: repeat(2, 1fr); }
