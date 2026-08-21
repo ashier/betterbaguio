@@ -49,6 +49,7 @@ assets/css/*
 !assets/css/better-baguio.css
 assets/js/*
 !assets/js/site-shell.js
+!assets/js/weather-hero.js
 assets/images/logo/*
 !assets/images/logo/better-baguio-logo.svg
 !assets/images/logo/better-baguio-logo-white.svg

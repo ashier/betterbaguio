@@ -69,6 +69,15 @@ Sources: [City Government elected officials](https://main.baguio.gov.ph/governme
 
 The site directs non-emergency concerns to the live City Government directory because department contacts and office hours can change independently.
 
+## Live weather
+
+The home-page weather module requests current conditions and the day’s high/low forecast from the [Open-Meteo Forecast API](https://open-meteo.com/en/docs) at **16.4041° N, 120.6014° E**, rounded from the coordinates published for the [PAGASA Baguio station](https://pubfiles.pagasa.dost.gov.ph/cds/Baguio.pdf). Open-Meteo supplies model-based forecast conditions, not an on-site BetterBaguio observation.
+
+- Current weather codes are mapped to clear, cloudy, rain, or fog hero artwork using the API’s WMO interpretation codes.
+- Live data is cached in the visitor’s browser for ten minutes. An expired cache may be shown as “Recently reported” when the network is unavailable.
+- No temperature is fabricated when both the API and cache are unavailable; the module links to PAGASA instead.
+- Weather artwork is informational and never replaces PAGASA rainfall, thunderstorm, typhoon, or hazard advisories.
+
 ## Legal and historical baseline
 
 - [Act No. 48](https://elibrary.judiciary.gov.ph/thebookshelf/showdocs/28/15695) established local civil governments in Benguet townships, including Baguio, in November 1900.

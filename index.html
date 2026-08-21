@@ -14,12 +14,27 @@
 <body class="bb-body">
   <div data-site-header></div>
   <main id="main-content">
-    <section class="bb-hero">
+    <section class="bb-hero" data-weather-hero data-weather-state="loading">
+      <div class="bb-weather-scene" aria-hidden="true">
+        <span class="bb-weather-sun"></span>
+        <span class="bb-weather-cloud bb-weather-cloud-one"></span>
+        <span class="bb-weather-cloud bb-weather-cloud-two"></span>
+        <span class="bb-weather-cloud bb-weather-cloud-three"></span>
+        <span class="bb-weather-rain"></span>
+        <span class="bb-weather-fog bb-weather-fog-one"></span>
+        <span class="bb-weather-fog bb-weather-fog-two"></span>
+        <span class="bb-weather-fog bb-weather-fog-three"></span>
+      </div>
       <div class="bb-container bb-hero-grid">
         <div>
           <span class="bb-eyebrow">Independent civic information portal</span>
           <h1>A clearer path through Baguio City.</h1>
           <p>Find public services, elected officials, city data, local legislation, transparency resources, and emergency contacts—organized for residents, not departments.</p>
+          <div class="bb-weather-summary" data-weather-summary role="status" aria-live="polite">
+            <span class="bb-weather-symbol" data-weather-symbol aria-hidden="true">◌</span>
+            <span class="bb-weather-primary"><strong data-weather-temperature>Weather</strong><span data-weather-condition>Checking live Baguio conditions…</span></span>
+            <span class="bb-weather-details" data-weather-details></span>
+          </div>
           <div class="bb-actions">
             <a class="bb-button bb-button-primary" href="/services/">Find a city service</a>
             <a class="bb-button bb-button-secondary" href="/budget/">Explore public records</a>
@@ -115,5 +130,6 @@
   </main>
   <div data-site-footer></div>
   <script src="/assets/js/site-shell.js"></script>
+  <script src="/assets/js/weather-hero.js"></script>
 </body>
 </html>

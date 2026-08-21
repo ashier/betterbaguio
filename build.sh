@@ -64,6 +64,7 @@ if command -v rsync &>/dev/null; then
         --include='assets/css/better-baguio.css' \
         --exclude='assets/css/*' \
         --include='assets/js/site-shell.js' \
+        --include='assets/js/weather-hero.js' \
         --exclude='assets/js/*' \
         --include='assets/images/logo/better-baguio-mark.png' \
         --exclude='assets/images/logo/*' \
