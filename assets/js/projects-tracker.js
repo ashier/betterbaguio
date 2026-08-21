@@ -5,8 +5,8 @@
   if (!root) return;
 
   var SNAPSHOT_URLS = [
-    { url: 'https://data.betterbaguio.org/data/prism/projects.json', label: 'AWS weekly snapshot' },
-    { url: '/data/prism/projects.json', label: 'bundled fallback' }
+    { url: 'https://data.betterbaguio.org/data/prism/projects.json', label: 'weekly data copy' },
+    { url: '/data/prism/projects.json', label: 'built-in backup copy' }
   ];
   var PAGE_SIZE = 25;
   var stageOrder = ['Planning', 'Design', 'Procurement', 'Bidding', 'Implementation', 'Completed', 'Suspended', 'Terminated'];
@@ -47,8 +47,8 @@
 
   function formatRetrieved(iso) {
     var date = new Date(iso);
-    if (isNaN(date.getTime())) return 'Retrieval date unavailable';
-    return 'Retrieved ' + new Intl.DateTimeFormat('en-PH', {
+    if (isNaN(date.getTime())) return 'Update time unavailable';
+    return 'Updated ' + new Intl.DateTimeFormat('en-PH', {
       dateStyle: 'medium',
       timeStyle: 'short',
       timeZone: 'Asia/Manila'
@@ -126,7 +126,7 @@
     var max = Math.max.apply(Math, stages.map(function (stage) { return counts[stage]; }).concat([1]));
     if (!stages.length) {
       var empty = document.createElement('p');
-      empty.textContent = 'No matching stages.';
+      empty.textContent = 'No project stages match your filters.';
       elements.bars.appendChild(empty);
       return;
     }
@@ -155,7 +155,7 @@
     elements.rows.textContent = '';
     if (!projects.length) {
       var noResults = document.createElement('tr');
-      appendCell(noResults, 'No projects match these filters.', 'bb-project-empty').colSpan = 5;
+      appendCell(noResults, 'No projects match those filters. Try clearing one or two.', 'bb-project-empty').colSpan = 5;
       elements.rows.appendChild(noResults);
       elements.more.hidden = true;
       return;
@@ -178,12 +178,12 @@
       projectCell.appendChild(id);
       row.appendChild(projectCell);
 
-      appendCell(row, (project.barangays || []).join(', ') || 'Not specified');
+      appendCell(row, (project.barangays || []).join(', ') || 'Location not listed');
       var officeCell = document.createElement('td');
       var office = document.createElement('span');
       var bidder = document.createElement('small');
       office.textContent = project.implementing_office;
-      bidder.textContent = project.bidder || 'Contractor not listed';
+      bidder.textContent = project.bidder || 'No contractor listed';
       officeCell.appendChild(office);
       officeCell.appendChild(bidder);
       row.appendChild(officeCell);
@@ -209,7 +209,7 @@
     renderBars(projects);
     renderRows(projects);
     var shown = Math.min(visibleLimit, projects.length);
-    elements.summary.textContent = 'Showing ' + formatNumber(shown) + ' of ' + formatNumber(projects.length) + ' matching records.';
+    elements.summary.textContent = 'Showing ' + formatNumber(shown) + ' of ' + formatNumber(projects.length) + ' matching projects.';
     updateUrl();
   }
 
@@ -244,12 +244,12 @@
   }
 
   function renderError() {
-    elements.retrieved.textContent = 'The PRISM snapshot could not be loaded.';
+    elements.retrieved.textContent = 'We could not load the latest PRISM data.';
     elements.rows.textContent = '';
     var row = document.createElement('tr');
-    appendCell(row, 'Project data is temporarily unavailable. Use the official PRISM link above.', 'bb-project-empty').colSpan = 5;
+    appendCell(row, 'Project data is temporarily unavailable. You can still use the PRISM link above.', 'bb-project-empty').colSpan = 5;
     elements.rows.appendChild(row);
-    elements.summary.textContent = 'Data unavailable.';
+    elements.summary.textContent = 'Projects are temporarily unavailable.';
   }
 
   root.addEventListener('submit', function (event) { event.preventDefault(); });
@@ -296,7 +296,7 @@
     snapshot = data;
     replaceOptions(elements.year, snapshot.availableYears, '');
     applyInitialQuery();
-    elements.retrieved.textContent = formatRetrieved(snapshot.retrievedAt) + ' · ' + formatNumber(Object.keys(snapshot.years).reduce(function (total, year) { return total + snapshot.years[year].projects.length; }, 0)) + ' records archived · ' + result.label;
+    elements.retrieved.textContent = formatRetrieved(snapshot.retrievedAt) + ' · ' + formatNumber(Object.keys(snapshot.years).reduce(function (total, year) { return total + snapshot.years[year].projects.length; }, 0)) + ' records across all years · ' + result.label;
     render();
   }).catch(renderError);
 })();

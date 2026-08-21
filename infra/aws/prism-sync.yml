@@ -422,7 +422,7 @@ Resources:
               defaultYear,
               availableYears: years,
               source: {
-                name: 'City Government of Baguio Open Data Portal — PRISM',
+                name: 'City Government of Baguio Open Data Portal: PRISM',
                 page: 'https://data.baguio.gov.ph/prism',
                 statsEndpoint: new URL('stats', SOURCE_API).href,
                 projectsEndpoint: new URL('list', SOURCE_API).href,

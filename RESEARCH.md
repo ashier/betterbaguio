@@ -103,5 +103,5 @@ The home-page weather module requests current conditions and the day’s high/lo
 2. Index annual and supplemental budgets from appropriation ordinances and City Budget Office documents.
 3. Reconcile infrastructure projects across the City Government, DPWH, PhilGEPS, and COA using stable project or contract IDs.
 4. Add COA annual audit findings with direct report and page citations, without treating findings as final liability determinations.
-5. Import all 129 PSGC barangay records—name, code, urban/rural status, and 2024 population—into a dedicated machine-readable file.
+5. Import all 129 PSGC barangay records (name, code, urban/rural status, and 2024 population) into a dedicated machine-readable file.
 6. Recheck elected officials and emergency contacts quarterly and every time a vacancy or succession is announced.

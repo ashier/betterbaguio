@@ -132,7 +132,7 @@ async function run() {
     defaultYear,
     availableYears: years,
     source: {
-      name: 'City Government of Baguio Open Data Portal — PRISM',
+      name: 'City Government of Baguio Open Data Portal: PRISM',
       page: SOURCE_PAGE,
       statsEndpoint: new URL('prism/infra/stats', API_BASE).href,
       projectsEndpoint: new URL('prism/infra/list', API_BASE).href,

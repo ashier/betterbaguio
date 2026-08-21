@@ -16,7 +16,7 @@
     2015
   ],
   "source": {
-    "name": "City Government of Baguio Open Data Portal — PRISM",
+    "name": "City Government of Baguio Open Data Portal: PRISM",
     "page": "https://data.baguio.gov.ph/prism",
     "statsEndpoint": "https://data.baguio.gov.ph/api/prism/infra/stats",
     "projectsEndpoint": "https://data.baguio.gov.ph/api/prism/infra/list",

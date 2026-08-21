@@ -98,7 +98,7 @@
     condition.textContent = CONDITIONS[code] || 'Current conditions';
 
     if (high !== null && low !== null) pieces.push('H ' + high + '° · L ' + low + '°');
-    if (feels !== null) pieces.push('Feels ' + feels + '°');
+    if (feels !== null) pieces.push('Feels like ' + feels + '°');
     if (humidity !== null) pieces.push(humidity + '% humidity');
 
     var updated = formatPhtTime(current.time);
@@ -114,8 +114,8 @@
     setState('loading', true);
     symbol.textContent = '◌';
     temperature.textContent = 'Weather unavailable';
-    condition.textContent = 'Live Baguio conditions could not be loaded.';
-    details.innerHTML = '<small><a href="https://www.pagasa.dost.gov.ph/" target="_blank" rel="noopener">Check PAGASA</a></small>';
+    condition.textContent = 'We could not load Baguio’s weather right now.';
+    details.innerHTML = '<small><a href="https://www.pagasa.dost.gov.ph/" target="_blank" rel="noopener">Check the PAGASA forecast</a></small>';
   }
 
   function readCache(allowExpired) {
