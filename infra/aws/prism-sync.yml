@@ -1,0 +1,484 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Frugal weekly PRISM data sync for BetterBaguio.org
+
+Parameters:
+  AllowedSiteOrigin:
+    Type: String
+    Default: https://betterbaguio.org
+  AllowedWwwOrigin:
+    Type: String
+    Default: https://www.betterbaguio.org
+
+Resources:
+  PrismDataBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketName: !Sub betterbaguio-prism-${AWS::AccountId}-${AWS::Region}
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      LifecycleConfiguration:
+        Rules:
+          - Id: RemoveOldSnapshotVersions
+            Status: Enabled
+            NoncurrentVersionExpiration:
+              NoncurrentDays: 30
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+      Tags:
+        - Key: Project
+          Value: BetterBaguio
+        - Key: CostCenter
+          Value: public-data
+
+  PrismSourceCachePolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        Name: !Sub betterbaguio-prism-source-${AWS::AccountId}
+        Comment: Forward PRISM query strings while keeping source responses briefly cacheable
+        DefaultTTL: 60
+        MaxTTL: 300
+        MinTTL: 60
+        ParametersInCacheKeyAndForwardedToOrigin:
+          CookiesConfig:
+            CookieBehavior: none
+          EnableAcceptEncodingBrotli: true
+          EnableAcceptEncodingGzip: true
+          HeadersConfig:
+            HeaderBehavior: none
+          QueryStringsConfig:
+            QueryStringBehavior: all
+
+  PrismSourcePathGuard:
+    Type: AWS::CloudFront::Function
+    Properties:
+      Name: !Sub betterbaguio-prism-source-guard-${AWS::AccountId}
+      AutoPublish: true
+      FunctionCode: |
+        function handler(event) {
+          var request = event.request;
+          var query = request.querystring;
+          var expected = request.uri === '/stats'
+            ? ['year', 'fund', 'office', 'status']
+            : request.uri === '/list'
+              ? ['year', 'fund', 'office', 'status', 'limit', 'page']
+              : [];
+          var keys = Object.keys(query);
+          var valid = expected.length === keys.length;
+          for (var i = 0; valid && i < expected.length; i += 1) {
+            valid = Boolean(query[expected[i]] && query[expected[i]].value);
+          }
+          var year = valid ? Number(query.year.value) : 0;
+          valid = valid && year >= 2015 && year <= 2035
+            && query.fund.value === 'All'
+            && query.office.value === 'All'
+            && query.status.value === 'All';
+          if (valid && request.uri === '/list') {
+            valid = query.limit.value === '500' && /^[1-9][0-9]?$/.test(query.page.value);
+          }
+          if (!valid) {
+            return {
+              statusCode: 404,
+              statusDescription: 'Not Found',
+              headers: { 'cache-control': { value: 'no-store' } }
+            };
+          }
+          return request;
+        }
+      FunctionConfig:
+        Comment: Only allow the two read-only PRISM infrastructure endpoints
+        Runtime: cloudfront-js-2.0
+
+  PrismSourceDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Comment: Restricted BetterBaguio relay to the official PRISM API
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - GET
+            - HEAD
+          CachedMethods:
+            - GET
+            - HEAD
+          CachePolicyId: !Ref PrismSourceCachePolicy
+          Compress: true
+          FunctionAssociations:
+            - EventType: viewer-request
+              FunctionARN: !GetAtt PrismSourcePathGuard.FunctionARN
+          TargetOriginId: BaguioPrismOrigin
+          ViewerProtocolPolicy: https-only
+        Enabled: true
+        HttpVersion: http2and3
+        IPV6Enabled: true
+        Origins:
+          - ConnectionAttempts: 2
+            ConnectionTimeout: 10
+            CustomOriginConfig:
+              HTTPPort: 80
+              HTTPSPort: 443
+              OriginKeepaliveTimeout: 5
+              OriginProtocolPolicy: https-only
+              OriginReadTimeout: 20
+              OriginSSLProtocols:
+                - TLSv1.2
+            DomainName: data.baguio.gov.ph
+            Id: BaguioPrismOrigin
+            OriginPath: /api/prism/infra
+        PriceClass: PriceClass_200
+      Tags:
+        - Key: Project
+          Value: BetterBaguio
+        - Key: CostCenter
+          Value: public-data
+
+  PrismOriginAccessControl:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Description: Private access to the BetterBaguio PRISM snapshot
+        Name: !Sub betterbaguio-prism-${AWS::AccountId}
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  PrismResponseHeadersPolicy:
+    Type: AWS::CloudFront::ResponseHeadersPolicy
+    Properties:
+      ResponseHeadersPolicyConfig:
+        Name: !Sub betterbaguio-prism-cors-${AWS::AccountId}
+        Comment: CORS and security headers for the public PRISM snapshot
+        CorsConfig:
+          AccessControlAllowCredentials: false
+          AccessControlAllowHeaders:
+            Items:
+              - '*'
+          AccessControlAllowMethods:
+            Items:
+              - GET
+              - HEAD
+              - OPTIONS
+          AccessControlAllowOrigins:
+            Items:
+              - !Ref AllowedSiteOrigin
+              - !Ref AllowedWwwOrigin
+          AccessControlExposeHeaders:
+            Items:
+              - ETag
+              - Last-Modified
+          AccessControlMaxAgeSec: 86400
+          OriginOverride: true
+        SecurityHeadersConfig:
+          ContentTypeOptions:
+            Override: true
+          ReferrerPolicy:
+            ReferrerPolicy: strict-origin-when-cross-origin
+            Override: true
+
+  PrismDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Comment: BetterBaguio weekly PRISM data
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          CachedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+          Compress: true
+          ResponseHeadersPolicyId: !Ref PrismResponseHeadersPolicy
+          TargetOriginId: PrismS3Origin
+          ViewerProtocolPolicy: redirect-to-https
+        Enabled: true
+        HttpVersion: http2and3
+        IPV6Enabled: true
+        Origins:
+          - DomainName: !GetAtt PrismDataBucket.RegionalDomainName
+            Id: PrismS3Origin
+            OriginAccessControlId: !GetAtt PrismOriginAccessControl.Id
+            S3OriginConfig:
+              OriginAccessIdentity: ''
+        PriceClass: PriceClass_200
+      Tags:
+        - Key: Project
+          Value: BetterBaguio
+        - Key: CostCenter
+          Value: public-data
+
+  PrismDataBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref PrismDataBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowCloudFrontReadOnly
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub ${PrismDataBucket.Arn}/*
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub arn:${AWS::Partition}:cloudfront::${AWS::AccountId}:distribution/${PrismDistribution}
+
+  SyncLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    Properties:
+      LogGroupName: /aws/lambda/betterbaguio-prism-sync
+      RetentionInDays: 7
+      Tags:
+        - Key: Project
+          Value: BetterBaguio
+
+  SyncFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: betterbaguio-prism-sync-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: WriteSnapshotAndLogs
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: WriteOnlySnapshot
+                Effect: Allow
+                Action: s3:PutObject
+                Resource: !Sub ${PrismDataBucket.Arn}/data/prism/projects.json
+              - Sid: WriteFunctionLogs
+                Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/betterbaguio-prism-sync:*
+      Tags:
+        - Key: Project
+          Value: BetterBaguio
+        - Key: CostCenter
+          Value: public-data
+
+  SyncFunction:
+    Type: AWS::Lambda::Function
+    DependsOn: SyncLogGroup
+    Properties:
+      FunctionName: betterbaguio-prism-sync
+      Description: Validates and archives public Baguio PRISM infrastructure data
+      Runtime: nodejs22.x
+      Architectures:
+        - arm64
+      Handler: index.handler
+      MemorySize: 256
+      Timeout: 120
+      Role: !GetAtt SyncFunctionRole.Arn
+      Environment:
+        Variables:
+          OUTPUT_BUCKET: !Ref PrismDataBucket
+          OUTPUT_KEY: data/prism/projects.json
+          PRISM_API_BASE: !Sub https://${PrismSourceDistribution.DomainName}/
+      Code:
+        ZipFile: |
+          const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+          const s3 = new S3Client({});
+          const API = process.env.PRISM_API_BASE;
+          const SOURCE_API = 'https://data.baguio.gov.ph/api/prism/infra/';
+          const PAGE_LIMIT = 500;
+          const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+          async function getJson(endpoint, params) {
+            const url = new URL(endpoint, API);
+            Object.entries(params || {}).forEach(([key, value]) => url.searchParams.set(key, String(value)));
+            let lastError;
+            for (let attempt = 1; attempt <= 3; attempt += 1) {
+              const controller = new AbortController();
+              const timeout = setTimeout(() => controller.abort(), 20000);
+              try {
+                const response = await fetch(url, {
+                  headers: { Accept: 'application/json', 'User-Agent': 'BetterBaguio.org weekly open-data sync' },
+                  signal: controller.signal
+                });
+                if (!response.ok) throw new Error(`${response.status} ${response.statusText} for ${url}`);
+                const payload = await response.json();
+                if (!payload || typeof payload !== 'object') throw new Error(`Invalid JSON from ${url}`);
+                return payload;
+              } catch (error) {
+                lastError = error;
+                console.warn(JSON.stringify({
+                  url: String(url),
+                  attempt,
+                  message: error.message,
+                  cause: error.cause && {
+                    code: error.cause.code,
+                    message: error.cause.message,
+                    address: error.cause.address,
+                    port: error.cause.port
+                  }
+                }));
+                if (attempt < 3) await wait(attempt * 1500);
+              } finally {
+                clearTimeout(timeout);
+              }
+            }
+            throw new Error(`PRISM request failed after 3 attempts: ${lastError.message}; cause=${lastError.cause && (lastError.cause.code || lastError.cause.message)}`);
+          }
+
+          function validateProject(project, year, ids) {
+            if (!project || typeof project !== 'object') throw new Error(`Invalid ${year} project`);
+            for (const field of ['id', 'title', 'current_stage', 'implementing_office', 'appropriation']) {
+              if (project[field] === undefined || project[field] === null || project[field] === '') {
+                throw new Error(`${year} project missing ${field}`);
+              }
+            }
+            if (!Array.isArray(project.barangays)) throw new Error(`${project.id} has invalid barangays`);
+            if (!Number.isFinite(Number(project.appropriation))) throw new Error(`${project.id} has invalid appropriation`);
+            if (ids.has(project.id)) throw new Error(`Duplicate ${year} project id ${project.id}`);
+            ids.add(project.id);
+          }
+
+          async function getProjects(year) {
+            const common = { year, fund: 'All', office: 'All', status: 'All', limit: PAGE_LIMIT };
+            const first = await getJson('list', { ...common, page: 1 });
+            const projects = Array.isArray(first.data) ? first.data.slice() : [];
+            for (let page = 2; page <= Number(first.last_page || 1); page += 1) {
+              await wait(250);
+              const next = await getJson('list', { ...common, page });
+              if (!Array.isArray(next.data)) throw new Error(`Invalid ${year} project page ${page}`);
+              projects.push(...next.data);
+            }
+            if (projects.length !== Number(first.total)) throw new Error(`${year} list count mismatch`);
+            const ids = new Set();
+            projects.forEach(project => validateProject(project, year, ids));
+            return projects;
+          }
+
+          exports.handler = async () => {
+            const manilaYear = Number(new Intl.DateTimeFormat('en', { timeZone: 'Asia/Manila', year: 'numeric' }).format(new Date()));
+            const preferredYear = manilaYear - 1;
+            const all = { year: preferredYear, fund: 'All', office: 'All', status: 'All' };
+            const seed = await getJson('stats', all);
+            const years = [...new Set((seed.year_options || []).map(Number).filter(Number.isFinite))].sort((a, b) => b - a);
+            if (!years.length) throw new Error('PRISM returned no years');
+            const defaultYear = years.includes(preferredYear) ? preferredYear : years[0];
+            const yearData = {};
+            let projectCount = 0;
+            for (const year of years) {
+              const projects = await getProjects(year);
+              await wait(250);
+              const stats = year === preferredYear ? seed : await getJson('stats', { ...all, year });
+              if (projects.length !== Number(stats.total)) throw new Error(`${year} stats count mismatch`);
+              yearData[String(year)] = { stats, projects };
+              projectCount += projects.length;
+              await wait(250);
+            }
+            const snapshot = {
+              schemaVersion: 1,
+              retrievedAt: new Date().toISOString(),
+              defaultYear,
+              availableYears: years,
+              source: {
+                name: 'City Government of Baguio Open Data Portal — PRISM',
+                page: 'https://data.baguio.gov.ph/prism',
+                statsEndpoint: new URL('stats', SOURCE_API).href,
+                projectsEndpoint: new URL('list', SOURCE_API).href,
+                note: 'Data is provided as is and is not updated in real time.'
+              },
+              years: yearData
+            };
+            const body = JSON.stringify(snapshot);
+            await s3.send(new PutObjectCommand({
+              Bucket: process.env.OUTPUT_BUCKET,
+              Key: process.env.OUTPUT_KEY,
+              Body: body,
+              CacheControl: 'public, max-age=3600, stale-if-error=604800',
+              ContentType: 'application/json; charset=utf-8',
+              Metadata: { 'retrieved-at': snapshot.retrievedAt, 'project-count': String(projectCount) }
+            }));
+            console.log(JSON.stringify({ retrievedAt: snapshot.retrievedAt, years: years.length, projects: projectCount }));
+            return { retrievedAt: snapshot.retrievedAt, years: years.length, projects: projectCount };
+          };
+      Tags:
+        - Key: Project
+          Value: BetterBaguio
+        - Key: CostCenter
+          Value: public-data
+
+  SchedulerInvokeRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: betterbaguio-prism-scheduler-role
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: scheduler.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: InvokePrismSyncOnly
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: !GetAtt SyncFunction.Arn
+      Tags:
+        - Key: Project
+          Value: BetterBaguio
+        - Key: CostCenter
+          Value: public-data
+
+  WeeklySyncSchedule:
+    Type: AWS::Scheduler::Schedule
+    Properties:
+      Name: betterbaguio-prism-weekly
+      Description: Refresh BetterBaguio PRISM data every Monday morning
+      FlexibleTimeWindow:
+        Mode: 'OFF'
+      ScheduleExpression: cron(17 5 ? * MON *)
+      ScheduleExpressionTimezone: Asia/Manila
+      State: ENABLED
+      Target:
+        Arn: !GetAtt SyncFunction.Arn
+        RoleArn: !GetAtt SchedulerInvokeRole.Arn
+        RetryPolicy:
+          MaximumEventAgeInSeconds: 3600
+          MaximumRetryAttempts: 2
+
+Outputs:
+  SnapshotUrl:
+    Description: Public CloudFront URL for the validated PRISM snapshot
+    Value: !Sub https://${PrismDistribution.DomainName}/data/prism/projects.json
+  DistributionId:
+    Value: !Ref PrismDistribution
+  SourceProxyUrl:
+    Description: Restricted CloudFront relay used by Lambda to reach PRISM
+    Value: !Sub https://${PrismSourceDistribution.DomainName}
+  DataBucketName:
+    Value: !Ref PrismDataBucket
+  SyncFunctionName:
+    Value: !Ref SyncFunction
+  WeeklyScheduleName:
+    Value: !Ref WeeklySyncSchedule

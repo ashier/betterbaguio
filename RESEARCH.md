@@ -82,8 +82,10 @@ The home-page weather module requests current conditions and the day’s high/lo
 
 - The City Government’s [PRISM dashboard](https://data.baguio.gov.ph/prism) is the source for project IDs, titles, delivery stages, implementing offices, bidders, barangays, and appropriations.
 - Public PRISM endpoints used by the city dashboard are `https://data.baguio.gov.ph/api/prism/infra/stats` and `https://data.baguio.gov.ph/api/prism/infra/list`.
-- BetterBaguio stores a validated weekly snapshot for resilience and to avoid sending API requests for every page view. The scheduled sync runs Monday at 05:17 Asia/Manila and stays below the portal’s published 60-request rate limit.
+- BetterBaguio stores a validated weekly snapshot for resilience and to avoid sending API requests for every page view. An AWS Lambda function runs through EventBridge Scheduler every Monday at 05:17 Asia/Manila, writes the result to a private versioned S3 bucket, and serves it through CloudFront. The repository copy remains a browser fallback.
+- The portal does not accept direct connections from the Lambda network. A second CloudFront distribution therefore relays only the `/stats` and `/list` PRISM infrastructure paths; all other paths and methods are rejected. Query strings are constrained to the crawler’s expected shape.
 - The sync rejects malformed records, duplicate IDs within a year, incomplete pagination, and mismatches between aggregate and project-list totals.
+- The first AWS run on 21 August 2026 validated 516 records across 11 years. At one invocation per week, 256 MB of Lambda memory, a small S3 object, and CDN traffic for one JSON file, normal usage is expected to remain inside AWS free allowances and far below the ₱-equivalent of the US$5 monthly ceiling. AWS billing is usage-based, so this is an operating estimate rather than a hard spending cap.
 - PRISM states that its information is not real-time and is provided “as is.” An appropriation is an authorized project amount, not proof of expenditure, payment, completion, or final cost.
 
 ## Legal and historical baseline

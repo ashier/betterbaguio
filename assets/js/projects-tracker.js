@@ -4,7 +4,10 @@
   var root = document.querySelector('[data-project-filters]');
   if (!root) return;
 
-  var SNAPSHOT_URL = '/data/prism/projects.json';
+  var SNAPSHOT_URLS = [
+    { url: 'https://d2nylkwmqoqtlx.cloudfront.net/data/prism/projects.json', label: 'AWS weekly snapshot' },
+    { url: '/data/prism/projects.json', label: 'bundled fallback' }
+  ];
   var PAGE_SIZE = 25;
   var stageOrder = ['Planning', 'Design', 'Procurement', 'Bidding', 'Implementation', 'Completed', 'Suspended', 'Terminated'];
   var elements = {
@@ -241,7 +244,7 @@
   }
 
   function renderError() {
-    elements.retrieved.textContent = 'The local PRISM snapshot could not be loaded.';
+    elements.retrieved.textContent = 'The PRISM snapshot could not be loaded.';
     elements.rows.textContent = '';
     var row = document.createElement('tr');
     appendCell(row, 'Project data is temporarily unavailable. Use the official PRISM link above.', 'bb-project-empty').colSpan = 5;
@@ -274,15 +277,26 @@
     render();
   });
 
-  fetch(SNAPSHOT_URL, { cache: 'no-store' }).then(function (response) {
-    if (!response.ok) throw new Error('Snapshot request failed');
-    return response.json();
-  }).then(function (data) {
-    if (!data || !data.years || !Array.isArray(data.availableYears)) throw new Error('Invalid snapshot');
+  function loadSnapshot(index) {
+    var source = SNAPSHOT_URLS[index];
+    if (!source) return Promise.reject(new Error('No snapshot source available'));
+    return fetch(source.url).then(function (response) {
+      if (!response.ok) throw new Error('Snapshot request failed');
+      return response.json();
+    }).then(function (data) {
+      if (!data || !data.years || !Array.isArray(data.availableYears)) throw new Error('Invalid snapshot');
+      return { data: data, label: source.label };
+    }).catch(function () {
+      return loadSnapshot(index + 1);
+    });
+  }
+
+  loadSnapshot(0).then(function (result) {
+    var data = result.data;
     snapshot = data;
     replaceOptions(elements.year, snapshot.availableYears, '');
     applyInitialQuery();
-    elements.retrieved.textContent = formatRetrieved(snapshot.retrievedAt) + ' · ' + formatNumber(Object.keys(snapshot.years).reduce(function (total, year) { return total + snapshot.years[year].projects.length; }, 0)) + ' records archived';
+    elements.retrieved.textContent = formatRetrieved(snapshot.retrievedAt) + ' · ' + formatNumber(Object.keys(snapshot.years).reduce(function (total, year) { return total + snapshot.years[year].projects.length; }, 0)) + ' records archived · ' + result.label;
     render();
   }).catch(renderError);
 })();
