@@ -13,6 +13,9 @@
   var condition = summary.querySelector('[data-weather-condition]');
   var symbol = summary.querySelector('[data-weather-symbol]');
   var details = summary.querySelector('[data-weather-details]');
+  var controls = document.querySelector('[data-weather-controls]');
+  var previewButtons = controls ? controls.querySelectorAll('[data-weather-preview-mode]') : [];
+  var requestVersion = 0;
 
   var CONDITIONS = {
     0: 'Clear sky',
@@ -150,6 +153,12 @@
     };
   }
 
+  function setActiveControl(mode) {
+    Array.prototype.forEach.call(previewButtons, function (button) {
+      button.setAttribute('aria-pressed', button.getAttribute('data-weather-preview-mode') === mode ? 'true' : 'false');
+    });
+  }
+
   async function fetchWeather() {
     var params = new URLSearchParams({
       latitude: BAGUIO.latitude,
@@ -170,7 +179,34 @@
     }
   }
 
-  async function start() {
+  async function showLive() {
+    var version = ++requestVersion;
+    setActiveControl('live');
+    var fresh = readCache(false);
+    if (fresh) render(fresh, 'fresh');
+
+    try {
+      var live = await fetchWeather();
+      if (version !== requestVersion) return;
+      writeCache(live);
+      render(live, 'fresh');
+    } catch (error) {
+      if (version !== requestVersion || fresh) return;
+      var stale = readCache(true);
+      if (stale) render(stale, 'stale');
+      else renderUnavailable();
+    }
+  }
+
+  function showPreview(state) {
+    var sample = previewData(state);
+    if (!sample) return;
+    requestVersion += 1;
+    setActiveControl(state);
+    render(sample, 'preview');
+  }
+
+  function start() {
     var preview = null;
     if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
       preview = new URLSearchParams(location.search).get('weather-preview');
@@ -181,25 +217,20 @@
     }
     var sample = previewData(preview);
     if (sample) {
-      render(sample, 'preview');
+      showPreview(preview);
       return;
     }
 
-    var fresh = readCache(false);
-    if (fresh) render(fresh, 'fresh');
-
-    try {
-      var live = await fetchWeather();
-      writeCache(live);
-      render(live, 'fresh');
-    } catch (error) {
-      if (!fresh) {
-        var stale = readCache(true);
-        if (stale) render(stale, 'stale');
-        else renderUnavailable();
-      }
-    }
+    showLive();
   }
+
+  Array.prototype.forEach.call(previewButtons, function (button) {
+    button.addEventListener('click', function () {
+      var mode = button.getAttribute('data-weather-preview-mode');
+      if (mode === 'live') showLive();
+      else showPreview(mode);
+    });
+  });
 
   start();
 })();

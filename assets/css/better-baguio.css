@@ -97,6 +97,12 @@ a { color: var(--bb-green); }
 .bb-weather-details { padding-left: 14px; border-left: 1px solid rgba(18,63,51,.14); color: var(--bb-muted); font-size: .82rem; line-height: 1.4; }
 .bb-weather-details small { color: #73837e; }
 .bb-weather-details a { color: var(--bb-green); font-weight: 700; }
+.bb-weather-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; max-width: 700px; margin: -10px 0 24px; }
+.bb-weather-controls > span { margin-right: 3px; color: var(--bb-muted); font-size: .74rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.bb-weather-controls button { appearance: none; min-height: 34px; padding: 0 12px; border: 1px solid rgba(18,63,51,.16); border-radius: 999px; color: var(--bb-pine); background: rgba(255,255,255,.72); font: inherit; font-size: .78rem; font-weight: 800; cursor: pointer; transition: color .18s ease, background .18s ease, border-color .18s ease, transform .18s ease; }
+.bb-weather-controls button:hover { border-color: var(--bb-green); transform: translateY(-1px); }
+.bb-weather-controls button:focus-visible { outline: 3px solid rgba(53,116,95,.24); outline-offset: 2px; }
+.bb-weather-controls button[aria-pressed="true"] { border-color: var(--bb-pine); color: #fff; background: var(--bb-pine); }
 .bb-actions { display: flex; flex-wrap: wrap; gap: 12px; }
 .bb-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 0 18px; border-radius: 12px; text-decoration: none; font-weight: 800; }
 .bb-button-primary { color: #fff; background: var(--bb-pine); }
@@ -194,6 +200,7 @@ a.bb-card:hover { transform: translateY(-3px); box-shadow: var(--bb-shadow); }
   .bb-weather-fog { right: -35%; width: 110%; }
   .bb-weather-summary { display: grid; grid-template-columns: auto 1fr; width: 100%; }
   .bb-weather-details { grid-column: 1 / -1; padding: 9px 0 0; border-top: 1px solid rgba(18,63,51,.14); border-left: 0; }
+  .bb-weather-controls > span { flex-basis: 100%; }
   .bb-grid, .bb-grid-2, .bb-leaders, .bb-metrics, .bb-footer-grid { grid-template-columns: 1fr; }
   .bb-footer-grid > :first-child { grid-column: auto; }
   .bb-section-heading { display: block; }
