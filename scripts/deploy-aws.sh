@@ -3,7 +3,7 @@ set -euo pipefail
 
 DEPLOY_PROFILE="${1:-betterbaguio-deployer}"
 DEPLOY_REGION="${2:-ap-southeast-1}"
-ENABLE_WWW_ALIAS="${3:-false}"
+ENABLE_WWW_ALIAS="${3:-true}"
 STACK_NAME="betterbaguio-site"
 TEMPLATE_FILE="infra/aws/site-hosting.yml"
 SITE_DOMAIN="betterbaguio.org"

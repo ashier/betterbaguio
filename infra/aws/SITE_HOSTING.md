@@ -8,7 +8,7 @@ The public website is deployed without EC2. CloudFront serves a private S3 origi
 ./scripts/deploy-aws.sh betterbaguio-deployer ap-southeast-1
 ```
 
-The third argument controls the staged `www` cutover. Leave it at its default of `false` to create the redirect distribution and obtain its hostname. After the `www` CNAME points to that hostname, run:
+The third argument controls the `www` alias and defaults to `true` now that the DNS cutover is complete. During a fresh staged setup, pass `false` to create the redirect distribution and obtain its hostname before DNS is pointed at it. After the `www` CNAME points to that hostname, run:
 
 ```sh
 ./scripts/deploy-aws.sh betterbaguio-deployer ap-southeast-1 true
