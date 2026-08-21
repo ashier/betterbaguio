@@ -10,11 +10,26 @@ Parameters:
     Type: String
     Default: ''
     Description: Optional us-east-1 ACM certificate covering SiteDomainName
+  WwwCertificateArn:
+    Type: String
+    Default: ''
+    Description: Optional us-east-1 ACM certificate covering www.betterbaguio.org
+  EnableWwwAlias:
+    Type: String
+    Default: 'false'
+    AllowedValues:
+      - 'true'
+      - 'false'
+    Description: Enable only after www DNS points to the redirect distribution
 
 Conditions:
   UseCustomDomain: !And
     - !Not [!Equals [!Ref SiteDomainName, '']]
     - !Not [!Equals [!Ref CertificateArn, '']]
+  UseWwwRedirect: !Not [!Equals [!Ref WwwCertificateArn, '']]
+  UseWwwAlias: !And
+    - !Condition UseWwwRedirect
+    - !Equals [!Ref EnableWwwAlias, 'true']
 
 Resources:
   SiteBucket:
@@ -77,6 +92,49 @@ Resources:
         }
       FunctionConfig:
         Comment: Resolve directory-style civic information routes to index.html
+        Runtime: cloudfront-js-2.0
+
+  WwwRedirectFunction:
+    Type: AWS::CloudFront::Function
+    Condition: UseWwwRedirect
+    Properties:
+      Name: !Sub betterbaguio-www-redirect-${AWS::AccountId}
+      AutoPublish: true
+      FunctionCode: |
+        function serializeQueryString(query) {
+          var parts = [];
+          var keys = Object.keys(query);
+          for (var i = 0; i < keys.length; i += 1) {
+            var key = keys[i];
+            var entry = query[key];
+            if (entry.multiValue) {
+              for (var j = 0; j < entry.multiValue.length; j += 1) {
+                parts.push(encodeURIComponent(key) + '=' + encodeURIComponent(entry.multiValue[j].value));
+              }
+            } else {
+              parts.push(encodeURIComponent(key) + '=' + encodeURIComponent(entry.value || ''));
+            }
+          }
+          return parts.length ? '?' + parts.join('&') : '';
+        }
+
+        function handler(event) {
+          var request = event.request;
+          return {
+            statusCode: 301,
+            statusDescription: 'Moved Permanently',
+            headers: {
+              location: {
+                value: 'https://betterbaguio.org' + request.uri + serializeQueryString(request.querystring)
+              },
+              'cache-control': {
+                value: 'public, max-age=3600'
+              }
+            }
+          };
+        }
+      FunctionConfig:
+        Comment: Permanently redirect www.betterbaguio.org to the apex domain
         Runtime: cloudfront-js-2.0
 
   SiteResponseHeadersPolicy:
@@ -164,6 +222,50 @@ Resources:
         - Key: CostCenter
           Value: website
 
+  WwwRedirectDistribution:
+    Type: AWS::CloudFront::Distribution
+    Condition: UseWwwRedirect
+    Properties:
+      DistributionConfig:
+        Aliases: !If
+          - UseWwwAlias
+          - - www.betterbaguio.org
+          - !Ref AWS::NoValue
+        Comment: Redirect www.betterbaguio.org to the apex domain
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - GET
+            - HEAD
+          CachedMethods:
+            - GET
+            - HEAD
+          CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad
+          Compress: true
+          FunctionAssociations:
+            - EventType: viewer-request
+              FunctionARN: !GetAtt WwwRedirectFunction.FunctionARN
+          TargetOriginId: BetterBaguioWwwRedirectOrigin
+          ViewerProtocolPolicy: redirect-to-https
+        Enabled: true
+        HttpVersion: http2and3
+        IPV6Enabled: true
+        Origins:
+          - DomainName: !GetAtt SiteBucket.RegionalDomainName
+            Id: BetterBaguioWwwRedirectOrigin
+            OriginAccessControlId: !GetAtt SiteOriginAccessControl.Id
+            S3OriginConfig:
+              OriginAccessIdentity: ''
+        PriceClass: PriceClass_200
+        ViewerCertificate:
+          AcmCertificateArn: !Ref WwwCertificateArn
+          MinimumProtocolVersion: TLSv1.2_2021
+          SslSupportMethod: sni-only
+      Tags:
+        - Key: Project
+          Value: BetterBaguio
+        - Key: CostCenter
+          Value: website
+
   SiteBucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
@@ -180,6 +282,18 @@ Resources:
             Condition:
               StringEquals:
                 AWS:SourceArn: !Sub arn:${AWS::Partition}:cloudfront::${AWS::AccountId}:distribution/${SiteDistribution}
+          - !If
+            - UseWwwRedirect
+            - Sid: AllowWwwRedirectCloudFrontReadOnly
+              Effect: Allow
+              Principal:
+                Service: cloudfront.amazonaws.com
+              Action: s3:GetObject
+              Resource: !Sub ${SiteBucket.Arn}/*
+              Condition:
+                StringEquals:
+                  AWS:SourceArn: !Sub arn:${AWS::Partition}:cloudfront::${AWS::AccountId}:distribution/${WwwRedirectDistribution}
+            - !Ref AWS::NoValue
 
 Outputs:
   SiteBucketName:
@@ -190,3 +304,12 @@ Outputs:
     Value: !GetAtt SiteDistribution.DomainName
   SiteUrl:
     Value: !Sub https://${SiteDistribution.DomainName}
+  WwwRedirectDistributionId:
+    Condition: UseWwwRedirect
+    Value: !Ref WwwRedirectDistribution
+  WwwRedirectDomainName:
+    Condition: UseWwwRedirect
+    Value: !GetAtt WwwRedirectDistribution.DomainName
+  WwwRedirectUrl:
+    Condition: UseWwwRedirect
+    Value: https://www.betterbaguio.org

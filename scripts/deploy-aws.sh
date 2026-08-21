@@ -3,9 +3,16 @@ set -euo pipefail
 
 DEPLOY_PROFILE="${1:-betterbaguio-deployer}"
 DEPLOY_REGION="${2:-ap-southeast-1}"
+ENABLE_WWW_ALIAS="${3:-false}"
 STACK_NAME="betterbaguio-site"
 TEMPLATE_FILE="infra/aws/site-hosting.yml"
 SITE_DOMAIN="betterbaguio.org"
+WWW_CERTIFICATE_DOMAIN="*.betterbaguio.org"
+
+if [ "$ENABLE_WWW_ALIAS" != "true" ] && [ "$ENABLE_WWW_ALIAS" != "false" ]; then
+  echo "EnableWwwAlias must be true or false." >&2
+  exit 1
+fi
 
 CERTIFICATE_ARN="$(aws acm list-certificates \
   --profile "$DEPLOY_PROFILE" \
@@ -16,6 +23,18 @@ CERTIFICATE_ARN="$(aws acm list-certificates \
 
 if [ -z "$CERTIFICATE_ARN" ] || [ "$CERTIFICATE_ARN" = "None" ]; then
   echo "No issued us-east-1 ACM certificate found for $SITE_DOMAIN." >&2
+  exit 1
+fi
+
+WWW_CERTIFICATE_ARN="$(aws acm list-certificates \
+  --profile "$DEPLOY_PROFILE" \
+  --region us-east-1 \
+  --certificate-statuses ISSUED \
+  --query "CertificateSummaryList[?DomainName=='$WWW_CERTIFICATE_DOMAIN'].CertificateArn | [0]" \
+  --output text)"
+
+if [ -z "$WWW_CERTIFICATE_ARN" ] || [ "$WWW_CERTIFICATE_ARN" = "None" ]; then
+  echo "No issued us-east-1 ACM certificate found for $WWW_CERTIFICATE_DOMAIN." >&2
   exit 1
 fi
 
@@ -37,6 +56,8 @@ aws cloudformation deploy \
   --parameter-overrides \
     "SiteDomainName=$SITE_DOMAIN" \
     "CertificateArn=$CERTIFICATE_ARN" \
+    "WwwCertificateArn=$WWW_CERTIFICATE_ARN" \
+    "EnableWwwAlias=$ENABLE_WWW_ALIAS" \
   --no-fail-on-empty-changeset
 
 SITE_BUCKET="$(aws cloudformation describe-stacks \
@@ -58,6 +79,13 @@ SITE_URL="$(aws cloudformation describe-stacks \
   --region "$DEPLOY_REGION" \
   --stack-name "$STACK_NAME" \
   --query 'Stacks[0].Outputs[?OutputKey==`SiteUrl`].OutputValue' \
+  --output text)"
+
+WWW_REDIRECT_DOMAIN="$(aws cloudformation describe-stacks \
+  --profile "$DEPLOY_PROFILE" \
+  --region "$DEPLOY_REGION" \
+  --stack-name "$STACK_NAME" \
+  --query 'Stacks[0].Outputs[?OutputKey==`WwwRedirectDomainName`].OutputValue' \
   --output text)"
 
 echo "Pruning removed release files..."
@@ -99,3 +127,4 @@ aws cloudfront create-invalidation \
   --paths '/*' >/dev/null
 
 echo "Deployment complete: $SITE_URL"
+echo "WWW redirect DNS target: $WWW_REDIRECT_DOMAIN"
