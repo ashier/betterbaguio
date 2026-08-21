@@ -457,7 +457,7 @@ Resources:
       Description: Refresh BetterBaguio PRISM data every Monday morning
       FlexibleTimeWindow:
         Mode: 'OFF'
-      ScheduleExpression: cron(17 5 ? * MON *)
+      ScheduleExpression: cron(0 1 ? * MON *)
       ScheduleExpressionTimezone: Asia/Manila
       State: ENABLED
       Target:

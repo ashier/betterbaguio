@@ -1,6 +1,6 @@
 # BetterBaguio PRISM sync on AWS
 
-This stack refreshes Baguio City's public PRISM infrastructure data every Monday at 05:17 Asia/Manila. It is intentionally serverless and has no VPC, NAT gateway, API Gateway, database, WAF, provisioned capacity, custom KMS key, or Secrets Manager charge.
+This stack refreshes Baguio City's public PRISM infrastructure data every Monday at 01:00 Asia/Manila. It is intentionally serverless and has no VPC, NAT gateway, API Gateway, database, WAF, provisioned capacity, custom KMS key, or Secrets Manager charge.
 
 ## Architecture
 
