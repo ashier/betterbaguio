@@ -63,4 +63,5 @@ scripts/*
 !scripts/package-cpanel.sh
 !scripts/version.sh
 !scripts/sync-prism.mjs
+!scripts/deploy-aws.sh
 data/competitive-index.json

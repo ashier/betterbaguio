@@ -117,6 +117,8 @@ if command -v rsync &>/dev/null; then
         --exclude='.lighthouserc.json' \
         --exclude='.github' \
         --exclude='.gitignore' \
+        --exclude='.htaccess' \
+        --exclude='infra' \
         --exclude='validate-translations.js' \
         --exclude='tests' \
         --exclude='playwright.config.js' \
@@ -201,9 +203,9 @@ done
 
 echo "  Assets minified."
 
-# ── 6. cPanel file permissions (755 dirs / 644 files) ────────────────────────
+# ── 6. Portable web-hosting permissions (755 dirs / 644 files) ───────────────
 echo ""
-echo "▶ [6/6] Setting cPanel file permissions..."
+echo "▶ [6/6] Setting web-hosting file permissions..."
 find dist -type d -exec chmod 755 {} \;
 find dist -type f -exec chmod 644 {} \;
 echo "  Directories: 755 | Files: 644"
@@ -219,7 +221,7 @@ echo "╠═══════════════════════�
 printf  "║  Source: %-31s║\n" "${ORIG_SIZE}"
 printf  "║  Dist:   %-31s║\n" "${DIST_SIZE}"
 echo "╠══════════════════════════════════════════╣"
-echo "║  Upload dist/ → cPanel public_html/     ║"
+echo "║  AWS: ./scripts/deploy-aws.sh           ║"
 echo "║  Preview: cd dist && python3 -m http.server 8080  ║"
 echo "╚══════════════════════════════════════════╝"
 echo ""

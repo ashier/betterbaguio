@@ -24,6 +24,8 @@ const EXCLUDED = new Set([
   '.lighthouserc.json',
   '.github',
   '.gitignore',
+  '.htaccess',
+  'infra',
   'validate-translations.js',
   // Keep in step with the rsync exclude list in build.sh.
   'tests',
