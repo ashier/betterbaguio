@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Search Baguio City ordinances from 1945 onward by number, year, title, subject, or keyword, with links to official council records and PDFs."><link rel="canonical" href="https://betterbaguio.org/legislative/ordinances/"><link rel="icon" href="/assets/images/logo/better-baguio-mark.png" type="image/png"><link rel="stylesheet" href="/assets/css/better-baguio.css"><title>Search City Ordinances | BetterBaguio.org</title></head>
+<body class="bb-body"><div data-site-header></div><main id="main-content">
+  <section class="bb-page-hero bb-ordinances-hero"><div class="bb-container"><span class="bb-eyebrow">Baguio local laws</span><h1>Search the city’s ordinance archive.</h1><p>Find an ordinance by number, year, title, subject, or keyword. Every result links back to the Baguio City Council’s official record and PDF.</p></div></section>
+
+  <section class="bb-section"><div class="bb-container" data-ordinance-browser>
+    <div class="bb-data-strip"><div><strong>Updated weekly from the City Council</strong><span data-ordinance-retrieved>Loading the ordinance archive…</span></div><a href="https://citycouncil.baguio.gov.ph/ordinances" target="_blank" rel="noopener">Browse the official database →</a></div>
+
+    <div class="bb-metrics bb-ordinance-metrics" aria-live="polite">
+      <article class="bb-metric"><strong data-ordinance-count>…</strong><span>Ordinances indexed</span><small>Official council records</small></article>
+      <article class="bb-metric"><strong data-ordinance-years>…</strong><span>Years covered</span><small data-ordinance-range>Loading archive range</small></article>
+      <article class="bb-metric"><strong data-ordinance-latest>…</strong><span data-ordinance-latest-label>Latest year</span><small>Records in the newest year</small></article>
+      <article class="bb-metric"><strong>PDF</strong><span>Source documents</span><small>Opened from the official council site</small></article>
+    </div>
+
+    <form class="bb-ordinance-filters" data-ordinance-filters>
+      <label class="bb-ordinance-search"><span>Search the archive</span><input type="search" data-ordinance-search placeholder="Try 062-2026, traffic, senior citizens, or budget" autocomplete="off"></label>
+      <label><span>Year</span><select data-ordinance-year aria-label="Ordinance year"><option value="">All years</option></select></label>
+      <button class="bb-button bb-button-secondary" type="button" data-ordinance-clear>Clear filters</button>
+    </form>
+
+    <div class="bb-ordinance-results-head"><div><span class="bb-eyebrow">Official records</span><h2>Ordinances</h2></div><p data-ordinance-results-summary role="status" aria-live="polite">Loading ordinances…</p></div>
+    <div class="bb-ordinance-list" data-ordinance-list aria-busy="true"></div>
+    <div class="bb-project-more"><button class="bb-button bb-button-secondary" type="button" data-ordinance-more hidden>Show more ordinances</button></div>
+
+    <div class="bb-callout bb-ordinance-note"><strong>Use the official PDF when wording matters.</strong> BetterBaguio makes the council’s metadata easier to search, but the City Council record remains the source of truth. Some entries contain missing or duplicated source metadata, so use the record ID and PDF to confirm a citation.</div>
+    <ul class="bb-source-list"><li><a href="https://citycouncil.baguio.gov.ph/ordinances" target="_blank" rel="noopener">Baguio City Council: official ordinance database</a></li><li><a href="https://github.com/ashier/betterbaguio/blob/main/scripts/sync-ordinances.mjs" target="_blank" rel="noopener">BetterBaguio validation and synchronization script</a></li><li><a href="https://github.com/ashier/betterbaguio/blob/main/infra/aws/prism-sync.yml" target="_blank" rel="noopener">BetterBaguio weekly snapshot infrastructure</a></li></ul>
+    <noscript><div class="bb-callout" style="margin-top:20px"><strong>The searchable archive needs JavaScript.</strong> You can still browse ordinances in the official City Council database linked above.</div></noscript>
+  </div></section>
+</main><div data-site-footer></div><script src="/assets/js/site-shell.js"></script><script src="/assets/js/ordinance-index.js"></script></body></html>

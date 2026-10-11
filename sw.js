@@ -1,8 +1,8 @@
-var CACHE = 'betterbaguio-v0.1.0-projects';
+var CACHE = 'betterbaguio-v0.1.0-ordinances';
 var CORE = [
-  '/', '/services/', '/government/', '/statistics/', '/projects/', '/legislative/', '/budget/', '/contact/',
-  '/assets/css/better-baguio.css', '/assets/js/site-shell.js', '/assets/js/weather-hero.js', '/assets/js/projects-tracker.js',
-  '/data/prism/projects.json',
+  '/', '/services/', '/government/', '/statistics/', '/projects/', '/legislative/', '/legislative/ordinances/', '/budget/', '/contact/',
+  '/assets/css/better-baguio.css', '/assets/js/site-shell.js', '/assets/js/weather-hero.js', '/assets/js/projects-tracker.js', '/assets/js/ordinance-index.js',
+  '/data/prism/projects.json', '/data/ordinances.json',
   '/assets/images/logo/better-baguio-mark.png',
   '/manifest.webmanifest'
 ];

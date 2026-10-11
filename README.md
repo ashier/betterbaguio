@@ -14,11 +14,11 @@ The public build includes:
 - Official-service link directory
 - 2025–2028 elected leadership
 - 2024 population, barangay, land-area, and classification data
-- Official City Council links for live legislative records
+- Searchable 1945–present City Council ordinance index with official record and PDF links
 - Budget, procurement, audit, and open-data entry points
 - Verified emergency and City Government contacts
 
-Solano-specific fees, processing times, barangays, schools, projects, budgets, ordinances, and resolutions were intentionally excluded from the Better Baguio launch. See [RESEARCH.md](RESEARCH.md) for the source map and research backlog.
+Solano-specific fees, processing times, barangays, schools, budgets, ordinances, and resolutions remain excluded. Baguio project and ordinance records are included only through validated snapshots of official city sources. See [RESEARCH.md](RESEARCH.md) for the source map and research backlog.
 
 ## Run locally
 
@@ -43,7 +43,7 @@ The deployable site is written to `dist/`. The build excludes retained Better So
 1. Prefer primary sources: PSA, City Government of Baguio, Baguio City Council, COA, DBM, DPWH, PhilGEPS, and official legal repositories.
 2. Record the source URL and verification date for every changing fact.
 3. Do not copy another LGU’s fees, requirements, processing times, projects, or legislative records.
-4. Link to live official databases when republishing would create a stale parallel archive.
+4. Link every replicated record to its live official source and keep validated snapshots on a documented refresh schedule.
 5. Label BetterBaguio.org clearly as independent and volunteer-run.
 
 ## Attribution and license

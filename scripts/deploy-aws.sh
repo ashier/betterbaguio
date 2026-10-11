@@ -101,6 +101,7 @@ aws s3 cp dist/ "s3://$SITE_BUCKET/" \
   --recursive \
   --exclude '*.html' \
   --exclude 'data/prism/projects.json' \
+  --exclude 'data/ordinances.json' \
   --cache-control 'public,max-age=3600,stale-while-revalidate=604800'
 
 echo "Uploading HTML with revalidation..."
@@ -115,6 +116,13 @@ aws s3 cp dist/ "s3://$SITE_BUCKET/" \
 
 echo "Uploading bundled PRISM fallback..."
 aws s3 cp dist/data/prism/projects.json "s3://$SITE_BUCKET/data/prism/projects.json" \
+  --profile "$DEPLOY_PROFILE" \
+  --region "$DEPLOY_REGION" \
+  --cache-control 'public,max-age=3600,stale-if-error=604800' \
+  --content-type 'application/json; charset=utf-8'
+
+echo "Uploading bundled ordinance fallback..."
+aws s3 cp dist/data/ordinances.json "s3://$SITE_BUCKET/data/ordinances.json" \
   --profile "$DEPLOY_PROFILE" \
   --region "$DEPLOY_REGION" \
   --cache-control 'public,max-age=3600,stale-if-error=604800' \
