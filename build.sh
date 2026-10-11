@@ -66,6 +66,7 @@ if command -v rsync &>/dev/null; then
         --include='assets/js/site-shell.js' \
         --include='assets/js/weather-hero.js' \
         --include='assets/js/projects-tracker.js' \
+        --include='assets/js/ordinance-index.js' \
         --exclude='assets/js/*' \
         --include='assets/images/logo/better-baguio-mark.png' \
         --exclude='assets/images/logo/*' \
@@ -76,11 +77,13 @@ if command -v rsync &>/dev/null; then
         --include='data/' \
         --include='data/prism/' \
         --include='data/prism/projects.json' \
+        --include='data/ordinances.json' \
         --exclude='data/***' \
         --exclude='node_modules' \
         --exclude='dist' \
         --exclude='.git' \
         --exclude='.vscode' \
+        --exclude='*.code-workspace' \
         --exclude='.DS_Store' \
         --exclude='react-app' \
         --exclude='admin' \

@@ -25,9 +25,9 @@
         <button class="bb-menu-button" type="button" aria-expanded="false" aria-controls="bb-menu">Menu</button>
         <ul class="bb-menu" id="bb-menu">${nav}</ul>
       </nav><div class="bb-emergency"><div class="bb-container">
-        <strong>Emergency</strong><a href="tel:911">911</a>
-        <span>CDRRMO</span><a href="tel:0746611455">(074) 661-1455</a>
-        <span>EMS</span><a href="tel:09055551911">0905 555 1911</a>
+        <a class="bb-emergency-contact" href="tel:911" aria-label="Call emergency services at 911"><span>Emergency</span><strong>911</strong></a>
+        <a class="bb-emergency-contact" href="tel:0746611455" aria-label="Call CDRRMO at (074) 661-1455"><span>CDRRMO</span><strong>(074) 661-1455</strong></a>
+        <a class="bb-emergency-contact" href="tel:09055551911" aria-label="Call EMS at 0905 555 1911"><span>EMS</span><strong>0905 555 1911</strong></a>
       </div></div></header>`;
   }
 

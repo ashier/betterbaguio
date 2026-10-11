@@ -86,7 +86,7 @@ The home-page weather module requests current conditions and the day’s high/lo
 - The public snapshot uses the project-owned endpoint `https://data.betterbaguio.org/data/prism/projects.json`; the underlying CloudFront hostname is kept as an implementation detail.
 - The portal does not accept direct connections from the Lambda network. A second CloudFront distribution therefore relays only the `/stats` and `/list` PRISM infrastructure paths; all other paths and methods are rejected. Query strings are constrained to the crawler’s expected shape.
 - The sync rejects malformed records, duplicate IDs within a year, incomplete pagination, and mismatches between aggregate and project-list totals.
-- The first AWS run on 21 August 2026 validated 516 records across 11 years. At one invocation per week, 256 MB of Lambda memory, a small S3 object, and CDN traffic for one JSON file, normal usage is expected to remain inside AWS free allowances and far below the ₱-equivalent of the US$5 monthly ceiling. AWS billing is usage-based, so this is an operating estimate rather than a hard spending cap.
+- The first AWS run on 21 August 2026 validated 516 project records across 11 years. At one invocation per week, 512 MB of Lambda memory, small S3 snapshots, and modest CDN traffic, normal usage is expected to remain inside AWS free allowances and far below the ₱-equivalent of the US$5 monthly ceiling. AWS billing is usage-based, so this is an operating estimate rather than a hard spending cap.
 - PRISM states that its information is not real-time and is provided “as is.” An appropriation is an authorized project amount, not proof of expenditure, payment, completion, or final cost.
 
 ## Legal and historical baseline
@@ -97,10 +97,14 @@ The home-page weather module requests current conditions and the day’s high/lo
 - [Republic Act No. 11689](https://elibrary.judiciary.gov.ph/thebookshelf/showdocs/2/95223) revised the city charter in 2022.
 - The NHCP historical registry documents the [Philippine Commission’s 1904 first Baguio session](https://philhistoricsites.nhcp.gov.ph/registry_database/philippine-commissions-first-session-in-baguio/) and other marked city sites.
 
+## Ordinance archive
+
+The City Council's public `view-ordinances` endpoint was verified on 26 August 2026. BetterBaguio's validated snapshot contains 4,333 ordinance records from 1945 through 2026, including official record and PDF links. The source contains a small number of missing titles or summaries and duplicated ordinance-number groups, so the council's unique record ID is retained as the canonical identifier. The local snapshot can be refreshed with `npm run sync:ordinances`; the serverless public-data job refreshes the hosted copy weekly.
+
 ## Remaining research gaps
 
 1. Build a service-by-service dataset from the latest Baguio Citizen’s Charter, including requirements, fees, processing time, responsible office, and document revision date.
-2. Index annual and supplemental budgets from appropriation ordinances and City Budget Office documents.
+2. Classify annual and supplemental budgets from the indexed appropriation ordinances and City Budget Office documents.
 3. Reconcile infrastructure projects across the City Government, DPWH, PhilGEPS, and COA using stable project or contract IDs.
 4. Add COA annual audit findings with direct report and page citations, without treating findings as final liability determinations.
 5. Import all 129 PSGC barangay records (name, code, urban/rural status, and 2024 population) into a dedicated machine-readable file.
