@@ -1,0 +1,345 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Serverless email group for BetterBaguio.org (SES inbound, S3, Lambda forwarder)
+
+# Deploy in a region where SES can receive mail (us-east-1, us-west-2, eu-west-1, ...).
+
+Parameters:
+  DomainName:
+    Type: String
+    Default: betterbaguio.org
+    Description: Domain that receives the group mail
+  GroupLocalPart:
+    Type: String
+    Default: connect
+    AllowedPattern: '^[a-z0-9._+-]+$'
+    Description: Part before the @ of the group address, for example connect
+  GroupDisplayName:
+    Type: String
+    Default: BetterBaguio Connect
+    AllowedPattern: "^[A-Za-z0-9 ._&'-]+$"
+    Description: Name shown as the sender in members' inboxes
+  Members:
+    Type: CommaDelimitedList
+    Description: Inboxes that receive a copy of every message sent to the group
+  HostedZoneId:
+    Type: String
+    Default: ''
+    Description: Optional Route 53 hosted zone ID for the domain; leave empty to create the DNS records by hand
+
+Conditions:
+  CreateDnsRecords: !Not [!Equals [!Ref HostedZoneId, '']]
+
+Resources:
+  MailBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketName: !Sub betterbaguio-mail-${AWS::AccountId}-${AWS::Region}
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      LifecycleConfiguration:
+        Rules:
+          - Id: ExpireRawMail
+            Status: Enabled
+            ExpirationInDays: 30
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: Project
+          Value: BetterBaguio
+
+  MailBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref MailBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowSesToStoreInboundMail
+            Effect: Allow
+            Principal:
+              Service: ses.amazonaws.com
+            Action: s3:PutObject
+            Resource: !Sub ${MailBucket.Arn}/mail/*
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+              StringLike:
+                aws:SourceArn: !Sub arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:receipt-rule-set/betterbaguio-inbound:receipt-rule/*
+
+  Identity:
+    Type: AWS::SES::EmailIdentity
+    Properties:
+      EmailIdentity: !Ref DomainName
+
+  ForwardLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    Properties:
+      LogGroupName: /aws/lambda/betterbaguio-email-forward
+      RetentionInDays: 7
+      Tags:
+        - Key: Project
+          Value: BetterBaguio
+
+  ForwardFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: ReadMailSendAndLog
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Sid: ReadInboundMail
+                Effect: Allow
+                Action: s3:GetObject
+                Resource: !Sub ${MailBucket.Arn}/mail/*
+              - Sid: SendFromGroupDomain
+                Effect: Allow
+                Action:
+                  - ses:SendEmail
+                  - ses:SendRawEmail
+                # While the account is in the SES sandbox, SES also authorizes
+                # sending against each verified recipient identity.
+                Resource: !Sub arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:identity/*
+              - Sid: WriteFunctionLogs
+                Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/betterbaguio-email-forward:*
+      Tags:
+        - Key: Project
+          Value: BetterBaguio
+
+  ForwardFunction:
+    Type: AWS::Lambda::Function
+    DependsOn: ForwardLogGroup
+    Properties:
+      FunctionName: betterbaguio-email-forward
+      Description: Forwards mail sent to the group address to every member
+      Runtime: nodejs22.x
+      Architectures:
+        - arm64
+      Handler: index.handler
+      MemorySize: 512
+      Timeout: 120
+      Role: !GetAtt ForwardFunctionRole.Arn
+      Environment:
+        Variables:
+          GROUP_ADDRESS: !Sub ${GroupLocalPart}@${DomainName}
+          GROUP_NAME: !Ref GroupDisplayName
+          MEMBERS: !Join [',', !Ref Members]
+          MAIL_BUCKET: !Ref MailBucket
+          MAIL_PREFIX: mail/
+      Code:
+        ZipFile: |
+          const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');
+          const { SESv2Client, SendEmailCommand } = require('@aws-sdk/client-sesv2');
+
+          const s3 = new S3Client({});
+          const ses = new SESv2Client({});
+          const GROUP = process.env.GROUP_ADDRESS.toLowerCase();
+          const GROUP_NAME = process.env.GROUP_NAME;
+          const MEMBERS = process.env.MEMBERS.split(',').map((m) => m.trim()).filter(Boolean);
+          const LOOP_HEADER = 'X-BetterBaguio-Forwarded';
+          const STRIPPED = new Set([
+            'return-path', 'sender', 'message-id', 'dkim-signature', 'domainkeys-signature',
+            'received-spf', 'authentication-results', 'x-ses-receipt', 'x-ses-dkim-signature',
+          ]);
+
+          function parseHeaders(text) {
+            const headers = [];
+            for (const line of text.split('\r\n')) {
+              if (/^[ \t]/.test(line) && headers.length) {
+                headers[headers.length - 1].lines.push(line);
+                continue;
+              }
+              const colon = line.indexOf(':');
+              if (colon > 0) headers.push({ name: line.slice(0, colon), lines: [line] });
+            }
+            return headers;
+          }
+
+          const headerValue = (h) => h.lines.join('').slice(h.name.length + 1).trim();
+
+          function senderAddress(value) {
+            const m = value.match(/<([^<>]+)>\s*$/);
+            return (m ? m[1] : value).trim();
+          }
+
+          async function forward(messageId) {
+            const object = await s3.send(new GetObjectCommand({
+              Bucket: process.env.MAIL_BUCKET,
+              Key: process.env.MAIL_PREFIX + messageId,
+            }));
+            const raw = Buffer.from(await object.Body.transformToByteArray());
+            const split = raw.indexOf('\r\n\r\n');
+            if (split < 0) throw new Error('Message has no header/body separator');
+
+            const headers = parseHeaders(raw.subarray(0, split).toString('latin1'));
+            const find = (name) => headers.find((h) => h.name.toLowerCase() === name);
+            const from = find('from');
+            if (!from) return console.log(JSON.stringify({ dropped: messageId, reason: 'no-from' }));
+            if (find(LOOP_HEADER.toLowerCase())) {
+              return console.log(JSON.stringify({ dropped: messageId, reason: 'loop' }));
+            }
+            if (senderAddress(headerValue(from)).toLowerCase() === GROUP) {
+              return console.log(JSON.stringify({ dropped: messageId, reason: 'from-group' }));
+            }
+
+            const out = [
+              `From: "${GROUP_NAME}" <${GROUP}>`,
+              `X-Original-From: ${headerValue(from)}`,
+              `${LOOP_HEADER}: 1`,
+            ];
+            if (!find('reply-to')) out.push(`Reply-To: ${headerValue(from)}`);
+            for (const h of headers) {
+              const name = h.name.toLowerCase();
+              if (name !== 'from' && !STRIPPED.has(name)) out.push(...h.lines);
+            }
+            const message = Buffer.concat([Buffer.from(out.join('\r\n'), 'latin1'), raw.subarray(split)]);
+
+            const results = await Promise.allSettled(MEMBERS.map((member) => ses.send(new SendEmailCommand({
+              FromEmailAddress: GROUP,
+              Destination: { ToAddresses: [member] },
+              Content: { Raw: { Data: message } },
+            }))));
+
+            const failed = results.map((r, i) => (r.status === 'rejected' ? `${MEMBERS[i]}: ${r.reason.name}: ${r.reason.message}` : null)).filter(Boolean);
+            console.log(JSON.stringify({ forwarded: messageId, sent: MEMBERS.length - failed.length, failed }));
+            // Retrying only helps if nothing was delivered; a partial failure would duplicate mail.
+            if (failed.length === MEMBERS.length) throw new Error(`Every delivery failed for ${messageId}`);
+          }
+
+          exports.handler = async (event) => {
+            for (const { ses: record } of event.Records) {
+              const { messageId } = record.mail;
+              const { spamVerdict, virusVerdict } = record.receipt;
+              if (spamVerdict.status === 'FAIL' || virusVerdict.status === 'FAIL') {
+                console.log(JSON.stringify({ dropped: messageId, reason: 'spam-or-virus' }));
+                continue;
+              }
+              await forward(messageId);
+            }
+          };
+      Tags:
+        - Key: Project
+          Value: BetterBaguio
+
+  ForwardFunctionSesPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref ForwardFunction
+      Principal: ses.amazonaws.com
+      SourceAccount: !Ref AWS::AccountId
+      SourceArn: !Sub arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:receipt-rule-set/betterbaguio-inbound:receipt-rule/forward-group
+
+  ReceiptRuleSet:
+    Type: AWS::SES::ReceiptRuleSet
+    Properties:
+      RuleSetName: betterbaguio-inbound
+
+  GroupReceiptRule:
+    Type: AWS::SES::ReceiptRule
+    DependsOn:
+      - MailBucketPolicy
+      - ForwardFunctionSesPermission
+    Properties:
+      RuleSetName: !Ref ReceiptRuleSet
+      Rule:
+        Name: forward-group
+        Enabled: true
+        ScanEnabled: true
+        TlsPolicy: Optional
+        Recipients:
+          - !Sub ${GroupLocalPart}@${DomainName}
+        Actions:
+          - S3Action:
+              BucketName: !Ref MailBucket
+              ObjectKeyPrefix: mail/
+          - LambdaAction:
+              FunctionArn: !GetAtt ForwardFunction.Arn
+              InvocationType: Event
+
+  InboundMxRecord:
+    Type: AWS::Route53::RecordSet
+    Condition: CreateDnsRecords
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !Ref DomainName
+      Type: MX
+      TTL: '300'
+      ResourceRecords:
+        - !Sub 10 inbound-smtp.${AWS::Region}.amazonaws.com
+
+  DkimRecord1:
+    Type: AWS::Route53::RecordSet
+    Condition: CreateDnsRecords
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !GetAtt Identity.DkimDNSTokenName1
+      Type: CNAME
+      TTL: '300'
+      ResourceRecords:
+        - !GetAtt Identity.DkimDNSTokenValue1
+
+  DkimRecord2:
+    Type: AWS::Route53::RecordSet
+    Condition: CreateDnsRecords
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !GetAtt Identity.DkimDNSTokenName2
+      Type: CNAME
+      TTL: '300'
+      ResourceRecords:
+        - !GetAtt Identity.DkimDNSTokenValue2
+
+  DkimRecord3:
+    Type: AWS::Route53::RecordSet
+    Condition: CreateDnsRecords
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: !GetAtt Identity.DkimDNSTokenName3
+      Type: CNAME
+      TTL: '300'
+      ResourceRecords:
+        - !GetAtt Identity.DkimDNSTokenValue3
+
+Outputs:
+  GroupAddress:
+    Value: !Sub ${GroupLocalPart}@${DomainName}
+  MxRecord:
+    Description: MX record for the domain root (created automatically when HostedZoneId is set)
+    Value: !Sub 10 inbound-smtp.${AWS::Region}.amazonaws.com
+  DkimRecords:
+    Description: Three DKIM CNAMEs (name -> value) that verify the SES domain identity
+    Value: !Join
+      - ' | '
+      - - !Sub '${Identity.DkimDNSTokenName1} -> ${Identity.DkimDNSTokenValue1}'
+        - !Sub '${Identity.DkimDNSTokenName2} -> ${Identity.DkimDNSTokenValue2}'
+        - !Sub '${Identity.DkimDNSTokenName3} -> ${Identity.DkimDNSTokenValue3}'
+  ReceiptRuleSetName:
+    Description: Must be activated once with aws ses set-active-receipt-rule-set
+    Value: !Ref ReceiptRuleSet
+  MailBucketName:
+    Value: !Ref MailBucket
+  ForwardFunctionName:
+    Value: !Ref ForwardFunction
