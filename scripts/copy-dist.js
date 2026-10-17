@@ -82,4 +82,11 @@ if (fs.existsSync(prismSnapshot)) {
   fs.mkdirSync(path.dirname(prismDestination), { recursive: true });
   fs.copyFileSync(prismSnapshot, prismDestination);
 }
+const sentimentSnapshot = path.join(path.resolve(src), 'data', 'sentiment.json');
+if (fs.existsSync(sentimentSnapshot)) {
+  // build.sh removes it again unless its _status is "live".
+  const sentimentDestination = path.join(path.resolve(dest), 'data', 'sentiment.json');
+  fs.mkdirSync(path.dirname(sentimentDestination), { recursive: true });
+  fs.copyFileSync(sentimentSnapshot, sentimentDestination);
+}
 console.log(`Copied: ${src} → ${dest}`);

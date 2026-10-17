@@ -52,6 +52,7 @@ assets/js/*
 !assets/js/weather-hero.js
 !assets/js/projects-tracker.js
 !assets/js/ordinance-index.js
+!assets/js/sentiment-meter.js
 assets/images/logo/*
 !assets/images/logo/better-baguio-logo.svg
 !assets/images/logo/better-baguio-logo-white.svg
@@ -66,4 +67,9 @@ scripts/*
 !scripts/sync-prism.mjs
 !scripts/sync-ordinances.mjs
 !scripts/deploy-aws.sh
+!scripts/sync-sentiment.mjs
+!scripts/fixtures/
 data/competitive-index.json
+
+# Sentiment meter output (generated; live data is published by the sync job)
+data/sentiment.json

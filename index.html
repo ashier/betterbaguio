@@ -6,7 +6,7 @@
   <meta name="description" content="Find Baguio City services, officials, projects, public records, local data, and emergency contacts in one clear, independent guide.">
   <link rel="canonical" href="https://betterbaguio.org/">
   <link rel="icon" href="/assets/images/logo/better-baguio-mark.png" type="image/png">
-  <link rel="stylesheet" href="/assets/css/better-baguio.css?v=20260826-3">
+  <link rel="stylesheet" href="/assets/css/better-baguio.css?v=20261017-3">
   <title>BetterBaguio.org: A clearer guide to Baguio City</title>
 </head>
 <body class="bb-body">
@@ -38,6 +38,7 @@
             <a class="bb-button bb-button-secondary" href="/budget/">See budgets and records</a>
           </div>
         </div>
+        <div class="bb-hero-side">
         <aside class="bb-fact-panel" aria-label="Baguio at a glance">
           <div class="bb-fact-brand"><img src="/assets/images/logo/better-baguio-mark.png" alt="" width="512" height="512"><div><span>Better Baguio</span><h2>Baguio at a glance</h2></div></div>
           <div class="bb-fact"><strong>368,426</strong><span>Residents<br>2024 POPCEN</span></div>
@@ -45,6 +46,13 @@
           <div class="bb-fact"><strong>57.51 km²</strong><span>Land Area</span></div>
           <div class="bb-fact"><strong>1st class HUC</strong><span>City Classification</span></div>
         </aside>
+        <a class="bb-pulse-chip" href="#public-pulse" data-sentiment-chip hidden>
+          <span class="bb-pulse-chip-face" data-chip-face aria-hidden="true">😐</span>
+          <span class="bb-pulse-chip-copy"><span class="bb-pulse-chip-label">Public pulse</span><span class="bb-pulse-chip-line"><strong data-chip-score></strong> <span data-chip-verdict></span></span><span class="bb-pulse-chip-meta" data-chip-meta></span></span>
+          <span class="bb-pulse-chip-arrow" aria-hidden="true">↓</span>
+          <span class="bb-pulse-chip-bar" data-chip-bar aria-hidden="true"></span>
+        </a>
+        </div>
       </div>
     </section>
 
@@ -68,6 +76,14 @@
           <article class="bb-metric"><strong>94.3%</strong><span>Simple literacy</span><small>Ages 10–64, 2024</small></article>
         </div>
         <div class="bb-actions" style="margin-top:22px"><a class="bb-button bb-button-primary" href="/statistics/">See more city data</a></div>
+      </div>
+    </section>
+
+    <section class="bb-section bb-pulse" id="public-pulse" data-sentiment-meter aria-labelledby="public-pulse-title" hidden>
+      <div class="bb-container">
+        <div class="bb-section-heading"><div><span class="bb-eyebrow">Public pulse</span><h2 id="public-pulse-title">How people are reacting to city posts</h2></div><p>We read the public comments on City PIO Facebook posts that drew more than 50 comments, and sort each one as happy, neutral, or upset.</p></div>
+        <div data-sentiment-body></div>
+        <p class="bb-pulse-method">Comments are sorted automatically by AI, which can misread sarcasm or local slang. People who comment are not a representative sample of Baguio residents. We keep only the counts, never the comments or names. <a href="https://www.facebook.com/pio.baguio" target="_blank" rel="noopener">See the original posts</a>. <span data-sentiment-updated></span></p>
       </div>
     </section>
 
@@ -148,5 +164,6 @@
   <div data-site-footer></div>
   <script src="/assets/js/site-shell.js"></script>
   <script src="/assets/js/weather-hero.js"></script>
+  <script src="/assets/js/sentiment-meter.js" defer></script>
 </body>
 </html>
