@@ -92,8 +92,6 @@ if command -v rsync &>/dev/null; then
         --exclude='service-details' \
         --exclude='news' \
         --exclude='faq' \
-        --exclude='privacy' \
-        --exclude='terms' \
         --exclude='accessibility' \
         --exclude='sitemap' \
         --exclude='offline.html' \

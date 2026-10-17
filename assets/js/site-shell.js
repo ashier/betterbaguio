@@ -40,7 +40,7 @@
           <div><h2>Explore</h2><ul>${pages.slice(1).map(([label, href]) => `<li><a href="${href}">${label}</a></li>`).join('')}</ul></div>
           <div><h2>Official sources</h2><ul><li><a href="https://main.baguio.gov.ph/" target="_blank" rel="noopener">City Government</a></li><li><a href="https://citycouncil.baguio.gov.ph/" target="_blank" rel="noopener">City Council</a></li><li><a href="https://psa.gov.ph/classification/psgc/barangays/1430300000" target="_blank" rel="noopener">PSA city profile</a></li><li><a href="https://github.com/ashier/betterbaguio" target="_blank" rel="noopener">Source code</a></li></ul></div>
         </div>
-        <div class="bb-footer-bottom">Free to use · Every public fact links back to its source · Open-source, MIT-licensed code</div>
+        <div class="bb-footer-bottom">Free to use · Every public fact links back to its source · Open-source, MIT-licensed code · <a href="/privacy/">Privacy</a> · <a href="/terms/">Terms</a></div>
       </div></footer>`;
   }
 
