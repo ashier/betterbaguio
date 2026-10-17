@@ -67,6 +67,7 @@ if command -v rsync &>/dev/null; then
         --include='assets/js/weather-hero.js' \
         --include='assets/js/projects-tracker.js' \
         --include='assets/js/ordinance-index.js' \
+        --include='assets/js/sentiment-meter.js' \
         --exclude='assets/js/*' \
         --include='assets/images/logo/better-baguio-mark.png' \
         --exclude='assets/images/logo/*' \
@@ -78,6 +79,7 @@ if command -v rsync &>/dev/null; then
         --include='data/prism/' \
         --include='data/prism/projects.json' \
         --include='data/ordinances.json' \
+        --include='data/sentiment.json' \
         --exclude='data/***' \
         --exclude='node_modules' \
         --exclude='dist' \
@@ -142,6 +144,12 @@ else
     node scripts/copy-dist.js . dist
 fi
 echo "  Legacy files copied."
+
+# Sample (synthetic) sentiment data must never ship; only a live snapshot may.
+if [ -f dist/data/sentiment.json ] && ! node -e "process.exit(require('./dist/data/sentiment.json')._status === 'live' ? 0 : 1)"; then
+    rm dist/data/sentiment.json
+    echo "  Dropped non-live data/sentiment.json from dist."
+fi
 
 # ── 4. Build React app and merge health page ──────────────────────────────────
 echo ""

@@ -11,6 +11,8 @@
     "serve:dist": "cd dist && python3 -m http.server 8080",
     "sync:ordinances": "node scripts/sync-ordinances.mjs",
     "sync:prism": "node scripts/sync-prism.mjs",
+    "sync:sentiment": "node scripts/sync-sentiment.mjs",
+    "sync:sentiment:sample": "SENTIMENT_FIXTURE=scripts/fixtures/sentiment-sample.json SENTIMENT_FIXTURE_LABELS=1 node scripts/sync-sentiment.mjs",
     "version:major": "node scripts/bump-version.js major",
     "version:minor": "node scripts/bump-version.js minor",
     "version:patch": "node scripts/bump-version.js patch",
@@ -33,6 +35,7 @@
   "author": "Better Baguio volunteers",
   "license": "MIT",
   "devDependencies": {
+    "@anthropic-ai/sdk": "^0.135.0",
     "@babel/cli": "^7.23.9",
     "@babel/core": "^7.29.6",
     "@babel/preset-env": "^7.23.9",
@@ -43,7 +46,8 @@
     "html-minifier-terser": "^7.2.0",
     "playwright": "^1.61.0",
     "prettier": "^3.8.1",
-    "terser": "^5.44.1"
+    "terser": "^5.44.1",
+    "zod": "^4.6.7"
   },
   "overrides": {
     "tmp": "0.2.7",
